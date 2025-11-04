@@ -1,0 +1,133 @@
+{
+  "analyzeDalyGirl": {
+    "mostLoved": [
+      "🌟 <b>Parabéns, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a mais amada do dia! ❤️\n\nRecebeu um total de <b>{vote} corações</b>!\n\n✨ <i>Tá brilhando no lobby, hein?!</i>",
+      "🔥 <b>Olha só, {mention}!</b>\n\nSua skin <b>{skinname}</b> dominou o dia com <b>{vote} ❤️</b>!\n\n🎉 <i>Você tá no topo, campeão!</i>",
+      "💖 <b>É isso aí, {mention}!</b>\n\nA galera amou sua skin <b>{skinname}</b> com <b>{vote} corações</b>!\n\n🏆 <i>Essa merece um Victory Royale!</i>",
+      "🌈 <b>Que sucesso, {mention}!</b>\n\nSua skin <b>{skinname}</b> conquistou <b>{vote} ❤️</b> hoje!\n\n💎 <i>Tá arrasando no estilo!</i>",
+      "✨ <b>Mandou bem, {mention}!</b>\n\nA skin <b>{skinname}</b> foi a favorita com <b>{vote} corações</b>!\n\n🎯 <i>Continue brilhando!</i>",
+      "🎉 <b>Incrível, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi um sucesso absoluto com <b>{vote} ❤️</b>!\n\n✨ <i>Todo mundo amou!</i>",
+      "🏆 <b>Campeão do estilo, {mention}!</b>\n\nA skin <b>{skinname}</b> conquistou <b>{vote} corações</b> hoje!\n\n🔥 <i>Você arrasou!</i>",
+      "💎 <b>Brilhando como nunca, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a mais amada com <b>{vote} ❤️</b>!\n\n🌟 <i>Que estilo!</i>",
+      "✨ <b>Estilo em alta, {mention}!</b>\n\nA skin <b>{skinname}</b> recebeu <b>{vote} corações</b> hoje!\n\n🎯 <i>Você tá arrasando!</i>",
+      "🌟 <b>Top do dia, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a favorita com <b>{vote} ❤️</b>!\n\n🔥 <i>Continue assim!</i>",
+      "🎯 <b>Que escolha, {mention}!</b>\n\nA skin <b>{skinname}</b> conquistou <b>{vote} corações</b> hoje!\n\n💖 <i>Tá arrasando!</i>",
+      "💖 <b>Todo mundo amou, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi um sucesso com <b>{vote} ❤️</b>!\n\n🏆 <i>Parabéns!</i>",
+      "🔥 <b>Que estilo, {mention}!</b>\n\nA skin <b>{skinname}</b> dominou com <b>{vote} corações</b>!\n\n✨ <i>Você brilhou!</i>",
+      "🌈 <b>Arrasou, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a mais amada com <b>{vote} ❤️</b>!\n\n💎 <i>Que sucesso!</i>",
+      "✨ <b>Mandou bem demais, {mention}!</b>\n\nA skin <b>{skinname}</b> conquistou <b>{vote} corações</b> hoje!\n\n🎉 <i>Continue brilhando!</i>",
+      "🎉 <b>Estilo em alta, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a favorita com <b>{vote} ❤️</b>!\n\n🏆 <i>Você tá no topo!</i>",
+      "🏆 <b>Campeão do dia, {mention}!</b>\n\nA skin <b>{skinname}</b> recebeu <b>{vote} corações</b>!\n\n🔥 <i>Que escolha incrível!</i>",
+      "💎 <b>Brilhando como nunca, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi um sucesso com <b>{vote} ❤️</b>!\n\n🌟 <i>Todo mundo amou!</i>",
+      "✨ <b>Estilo impecável, {mention}!</b>\n\nA skin <b>{skinname}</b> conquistou <b>{vote} corações</b> hoje!\n\n🎯 <i>Você arrasou!</i>",
+      "🌟 <b>Top do estilo, {mention}!</b>\n\nSua skin <b>{skinname}</b> foi a mais amada com <b>{vote} ❤️</b>!\n\n🔥 <i>Continue assim!</i>"
+    ],
+    "mostHated": [
+      "😢 <b>Poxa, {mention}...</b>\n\nSua skin <b>{skinname}</b> não agradou muito hoje. Recebeu <b>{vote} hates</b>.\n\n💭 <i>Amanhã é um novo dia pra arrasar!</i>",
+      "👎 <b>Que pena, {mention}!</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} 😡</b> hoje.\n\n⚡ <i>Não desanima, amanhã tem mais!</i>",
+      "🌀 <b>Ei, {mention}!</b>\n\nA galera não curtiu muito a skin <b>{skinname}</b>, com <b>{vote} hates</b>.\n\n✨ <i>Quem sabe amanhã seja diferente?</i>",
+      "❌ <b>Não foi o dia, {mention}...</b>\n\nSua skin <b>{skinname}</b> recebeu <b>{vote} 😡</b>.\n\n💪 <i>Levanta a cabeça, amanhã tem mais chances!</i>",
+      "💔 <b>Força, {mention}!</b>\n\nA skin <b>{skinname}</b> não fez sucesso e acumulou <b>{vote} hates</b>.\n\n🌟 <i>Não desista, o estilo é seu!</i>",
+      "😔 <b>Que triste, {mention}...</b>\n\nA skin <b>{skinname}</b> não agradou e recebeu <b>{vote} hates</b>.\n\n💡 <i>Mas amanhã é um novo dia pra brilhar!</i>",
+      "💥 <b>Não foi dessa vez, {mention}!</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} 😡</b> hoje.\n\n✨ <i>Continue tentando, o estilo é seu!</i>",
+      "😟 <b>Oh não, {mention}!</b>\n\nA skin <b>{skinname}</b> não fez sucesso e recebeu <b>{vote} hates</b>.\n\n🌈 <i>Amanhã é uma nova chance pra arrasar!</i>",
+      "🛑 <b>Sem amor para a skin, {mention}...</b>\n\nA skin <b>{skinname}</b> recebeu <b>{vote} 😡</b> hoje.\n\n💭 <i>Não desista, o estilo é seu!</i>",
+      "💔 <b>Que pena, {mention}...</b>\n\nA skin <b>{skinname}</b> não foi bem recebida e acumulou <b>{vote} hates</b>.\n\n⚡ <i>Levanta a cabeça, amanhã tem mais!</i>",
+      "😢 <b>Não foi o dia, {mention}...</b>\n\nA skin <b>{skinname}</b> recebeu <b>{vote} 😡</b> hoje.\n\n💪 <i>Continue tentando, você consegue!</i>",
+      "👎 <b>Sem sucesso, {mention}...</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} hates</b>.\n\n✨ <i>Mas amanhã é um novo dia pra brilhar!</i>",
+      "🌀 <b>Que pena, {mention}...</b>\n\nA skin <b>{skinname}</b> não agradou e recebeu <b>{vote} 😡</b>.\n\n🌟 <i>Não desista, o estilo é seu!</i>",
+      "❌ <b>Não foi dessa vez, {mention}...</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} hates</b> hoje.\n\n💭 <i>Amanhã é uma nova chance pra arrasar!</i>",
+      "💔 <b>Força, {mention}!</b>\n\nA skin <b>{skinname}</b> não fez sucesso e recebeu <b>{vote} 😡</b>.\n\n✨ <i>Continue tentando, o estilo é seu!</i>",
+      "😟 <b>Oh não, {mention}...</b>\n\nA skin <b>{skinname}</b> não agradou e acumulou <b>{vote} hates</b>.\n\n🌈 <i>Amanhã é um novo dia pra brilhar!</i>",
+      "🛑 <b>Sem amor para a skin, {mention}...</b>\n\nA skin <b>{skinname}</b> recebeu <b>{vote} 😡</b> hoje.\n\n💡 <i>Mas amanhã é uma nova chance pra arrasar!</i>",
+      "💥 <b>Não foi o dia, {mention}...</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} hates</b>.\n\n⚡ <i>Levanta a cabeça, amanhã tem mais!</i>",
+      "😔 <b>Que triste, {mention}...</b>\n\nA skin <b>{skinname}</b> não foi bem recebida e recebeu <b>{vote} 😡</b>.\n\n✨ <i>Continue tentando, você consegue!</i>",
+      "👎 <b>Sem sucesso, {mention}...</b>\n\nA skin <b>{skinname}</b> acumulou <b>{vote} hates</b> hoje.\n\n🌟 <i>Mas amanhã é um novo dia pra brilhar!</i>"
+    ]
+  },
+  "x1Duels": {
+    "soloLose": [
+      "<a href='tg://user?id={userId}'>{username}</a> entrou no X1 sozinho e perdeu pra própria sombra. 👻",
+      "<a href='tg://user?id={userId}'>{username}</a> tentou jogar contra o vento... e perdeu feio. 💨",
+      "<a href='tg://user?id={userId}'>{username}</a> desafiou o próprio reflexo no espelho e saiu chorando. 😭",
+      "<a href='tg://user?id={userId}'>{username}</a> jogou X1 contra a imaginação e tomou uma surra épica. 🤡",
+      "<a href='tg://user?id={userId}'>{username}</a> tentou duelar com sua própria sombra... A sombra ganhou. 🌚",
+      "<a href='tg://user?id={userId}'>{username}</a> fez um X1 solo tão ruim que até o Luigi riu. 😂",
+      "<a href='tg://user?id={userId}'>{username}</a> desafiou o ar e mesmo assim perdeu. Que vergonha! 🌬️",
+      "<a href='tg://user?id={userId}'>{username}</a> tentou jogar contra ninguém e perdeu para todo mundo. 🤦‍♂️",
+      "<a href='tg://user?id={userId}'>{username}</a> fez um duelo tão solitário que até os bots fugiram. 🤖",
+      "<a href='tg://user?id={userId}'>{username}</a> jogou X1 sozinho e perdeu para o próprio dedo mindinho. 👶",
+      "<a href='tg://user?id={userId}'>{username}</a> desafiou sua própria autoestima... e perdeu. 😅",
+      "<a href='tg://user?id={userId}'>{username}</a> tentou fazer X1 consigo mesmo e empatou... mas perdeu mesmo assim! 🙃",
+      "<a href='tg://user?id={userId}'>{username}</a> jogou contra o eco da própria voz e ainda assim ficou mudo! 🔇",
+      "<a href='tg://user?id={userId}'>{username}</a> fez X1 solo e perdeu para a tela de loading do Fortnite. ⏳",
+      "<a href='tg://user?id={userId}'>{username}</a> tentou duelar com o próprio cursor do mouse... O mouse ganhou! 🖱️"
+    ],
+    "attackVsFlee": [
+      "⚔️ <a href='tg://user?id={winnerId}'>{winnerName}</a> atacou com fúria enquanto <a href='tg://user?id={loserId}'>{loserName}</a> tentou fugir como um covarde! 🏃‍♂️💨",
+      "⚔️ <a href='tg://user?id={winnerId}'>{winnerName}</a> foi implacável no ataque! <a href='tg://user?id={loserId}'>{loserName}</a> fugiu mais rápido que skin grátis! 🎯",
+      "⚔️ <a href='tg://user?id={winnerId}'>{winnerName}</a> dominou o campo de batalha! <a href='tg://user?id={loserId}'>{loserName}</a> correu que nem frango assado! 🐔",
+      "⚔️ <a href='tg://user?id={winnerId}'>{winnerName}</a> partiu pra cima! <a href='tg://user?id={loserId}'>{loserName}</a> saiu correndo feito ladrão de galinha! 🐓",
+      "⚔️ <a href='tg://user?id={winnerId}'>{winnerName}</a> mostrou quem manda! <a href='tg://user?id={loserId}'>{loserName}</a> fugiu chorando para a mamãe! 👶"
+    ],
+    "defendVsAttack": [
+      "🛡️ <a href='tg://user?id={winnerId}'>{winnerName}</a> defendeu como um muro de metal! <a href='tg://user?id={loserId}'>{loserName}</a> se quebrou todo no ataque! 🧱",
+      "🛡️ <a href='tg://user?id={winnerId}'>{winnerName}</a> bloqueou tudo! <a href='tg://user?id={loserId}'>{loserName}</a> bateu que nem mosca no vidro! 🪰",
+      "🛡️ <a href='tg://user?id={winnerId}'>{winnerName}</a> foi uma fortaleza impenetrável! <a href='tg://user?id={loserId}'>{loserName}</a> se machucou atacando! 🏰",
+      "🛡️ <a href='tg://user?id={winnerId}'>{winnerName}</a> bloqueou como o Captain America! <a href='tg://user?id={loserId}'>{loserName}</a> quebrou as unhas tentando atacar! 🦸‍♂️",
+      "🛡️ <a href='tg://user?id={winnerId}'>{winnerName}</a> defendeu melhor que goleiro em final de copa! <a href='tg://user?id={loserId}'>{loserName}</a> perdeu o fôlego atacando! ⚽"
+    ],
+    "fleeVsDefend": [
+      "💨 <a href='tg://user?id={winnerId}'>{winnerName}</a> foi esperto e fugiu! <a href='tg://user?id={loserId}'>{loserName}</a> ficou defendendo o vazio! 🤡",
+      "💨 <a href='tg://user?id={winnerId}'>{winnerName}</a> escapou como ninja! <a href='tg://user?id={loserId}'>{loserName}</a> defendeu o ar! 🥷",
+      "💨 <a href='tg://user?id={winnerId}'>{winnerName}</a> deu no pé! <a href='tg://user?id={loserId}'>{loserName}</a> ficou plantado feito poste! 🚏",
+      "💨 <a href='tg://user?id={winnerId}'>{winnerName}</a> sumiu que nem pum no vento! <a href='tg://user?id={loserId}'>{loserName}</a> defendeu fantasma! 👻",
+      "💨 <a href='tg://user?id={winnerId}'>{winnerName}</a> correu mais rápido que Sonic! <a href='tg://user?id={loserId}'>{loserName}</a> ficou segurando vento! 💨"
+    ],
+    "tie": [
+      "🤝 Empate! Ambos escolheram a mesma ação. <a href='tg://user?id={player1Id}'>{player1Name}</a> e <a href='tg://user?id={player2Id}'>{player2Name}</a> pensam igual! 🧠",
+      "🤝 Deu velha! <a href='tg://user?id={player1Id}'>{player1Name}</a> e <a href='tg://user?id={player2Id}'>{player2Name}</a> empataram feio! ⚖️",
+      "🤝 Empate técnico! <a href='tg://user?id={player1Id}'>{player1Name}</a> e <a href='tg://user?id={player2Id}'>{player2Name}</a> são irmãos gêmeos mesmo! 👯‍♂️",
+      "🤝 Ninguém ganhou! <a href='tg://user?id={player1Id}'>{player1Name}</a> e <a href='tg://user?id={player2Id}'>{player2Name}</a> têm a mesma mentalidade! 💭",
+      "🤝 Empate dramático! <a href='tg://user?id={player1Id}'>{player1Name}</a> e <a href='tg://user?id={player2Id}'>{player2Name}</a> leram a mente um do outro! 🔮"
+    ],
+    "critical": [
+      "💥 CRÍTICO! <a href='tg://user?id={winnerId}'>{winnerName}</a> aplicou um golpe devastador em <a href='tg://user?id={loserId}'>{loserName}</a>! 🔥",
+      "💥 HEADSHOT! <a href='tg://user?id={winnerId}'>{winnerName}</a> acertou em cheio! <a href='tg://user?id={loserId}'>{loserName}</a> foi pro lobby! 🎯",
+      "💥 DESTRUCTION! <a href='tg://user?id={winnerId}'>{winnerName}</a> obliterou <a href='tg://user?id={loserId}'>{loserName}</a> da existência! ☄️",
+      "💥 FATALITY! <a href='tg://user?id={winnerId}'>{winnerName}</a> finalizou <a href='tg://user?id={loserId}'>{loserName}</a> com estilo! 🥊",
+      "💥 ULTRA COMBO! <a href='tg://user?id={winnerId}'>{winnerName}</a> aplicou o golpe mortal! <a href='tg://user?id={loserId}'>{loserName}</a> nem viu o que aconteceu! ⚡"
+    ],
+    "fail": [
+      "🤡 FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> falhou miseravelmente! <a href='tg://user?id={winnerId}'>{winnerName}</a> riu tanto que ganhou! 😂",
+      "🤡 EPIC FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> tropeçou na própria estratégia! <a href='tg://user?id={winnerId}'>{winnerName}</a> venceu rindo! 🤣",
+      "🤡 QUE FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> errou tão feio que virou meme! <a href='tg://user?id={winnerId}'>{winnerName}</a> ganhou de graça! 📱",
+      "🤡 FAIL HISTÓRICO! <a href='tg://user?id={loserId}'>{loserName}</a> falhou de um jeito nunca visto! <a href='tg://user?id={winnerId}'>{winnerName}</a> nem acredita que ganhou! 😱",
+      "🤡 MEGA FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> se enrolou todo! <a href='tg://user?id={winnerId}'>{winnerName}</a> ganhou sem nem tentar! 🙈"
+    ],
+    "singleAbandon": [
+      "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou <a href='tg://user?id={abandonerId}'>{abandonerName}</a> por 30 minutos... e ele fugiu! 🏃‍♂️",
+      "<a href='tg://user?id={waiterId}'>{waiterName}</a> ficou plantado esperando <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que sumiu no mundo! 🌍",
+      "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> deixou <a href='tg://user?id={waiterId}'>{waiterName}</a> falando sozinho por 30 minutos. Que vacilo! 😤",
+      "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou tanto <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que criou barba! 🧔",
+      "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> fugiu mais rápido que ladrão de galinha. <a href='tg://user?id={waiterId}'>{waiterName}</a> venceu por W.O.! 🐓"
+    ],
+    "doubleAbandon": [
+      "O X1 foi tão parado que virou sessão de meditação. 🧘‍♂️",
+      "Ambos esqueceram do X1. A paz venceu. ☮️",
+      "O duelo foi tão zen que ninguém apareceu para brigar. 🕯️",
+      "Parece que os dois foram tomar um café e esqueceram do X1. ☕",
+      "O X1 mais silencioso da história. Até o crickets pararam de fazer barulho. 🦗",
+      "Um duelo tão fantasma que nem os fantasmas apareceram. 👻",
+      "O X1 virou hide and seek, mas ninguém procurou ninguém. 🙈",
+      "Esse foi o X1 mais pacífico da história. Gandhi ficaria orgulhoso. ✌️"
+    ],
+    "promotional": [
+      "⚔️ <b>Hora do X1!</b> ⚔️\n\nJá mandou seu X1 hoje? Desafie alguém com /x1 e prove que você não é embananado! 🍌\n\n💥 <i>Responda a mensagem de alguém e digite /x1!</i>",
+      "🔥 <b>Cadê a coragem?</b> 🔥\n\nO dia tá passando e ninguém duelou ainda! Use /x1 para mostrar quem manda no grupo! 👑\n\n⚡ <i>X1 é coisa de macho raiz!</i>",
+      "🎯 <b>Duelo Real!</b> 🎯\n\nCansei de ver só papo furado! Vamos ver quem tem peito para um X1 de verdade! 💪\n\n🚀 <i>Digite /x1 respondendo a mensagem de alguém!</i>",
+      "⚡ <b>Desafio Aceito?</b> ⚡\n\nTá todo mundo muito quieto aqui... Será que ninguém tem coragem de chamar para o X1? 🐔\n\n🔥 <i>Use /x1 e mostre sua garra!</i>",
+      "💀 <b>Arena Vazia!</b> 💀\n\nA arena tá vazia! Cadê os guerreiros para um duelo épico? 🗡️\n\n✨ <i>Responda alguém e mande /x1 para começar a zueira!</i>"
+    ]
+  }
+}
