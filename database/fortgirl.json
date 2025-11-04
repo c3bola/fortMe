@@ -1,0 +1,412 @@
+[
+  {
+    "id": 1,
+    "imageId": "AgACAgEAAxkBAALMBWgC_A8mDMKyPjR2-Jf5bZ8DFWXWAAIlrjEbdQUZRCJ3_OWDGZEFAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T01:29:37.275Z",
+    "text": "Hoje, {user}, será a Aloy 🏹 por 1 dia",
+    "name": "Aloy",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 2,
+    "imageId": "AgACAgEAAxkBAALMC2gC_LnbxhtZ1zy2z9y_EkzNoOVIAAImrjEbdQUZRPer-6zn1hKJAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T01:30:56.812Z",
+    "text": "Hoje, {user}, será a Ariana Grande 🐽 por 1 dia",
+    "name": "Ariana Grande",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 3,
+    "imageId": "AgACAgEAAxkBAALMPGgDDrpifhKY1QXWpGgjZN0cb5hqAAInrjEbdQUZRAKLQcLLInO0AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T02:47:59.675Z",
+    "text": "Hoje, {user}, será a Arlequina 🤪 por 1 dia",
+    "name": "Alequina",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 4,
+    "imageId": "AgACAgEAAxkBAALMQWgDDv_Ys4546GoiojzdnrY84oXJAAIorjEbdQUZRH-h1CcBT1h-AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T02:48:50.967Z",
+    "text": "Hoje, {user}, será a Batedora Galaxy 🌌 por 1 dia",
+    "name": "Batedora Galaxy",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 5,
+    "imageId": "AgACAgEAAxkBAALMRGgDD1g8nqLk8D9-EMg1ZleisPfYAAIprjEbdQUZRHUjEl1EwdbiAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T02:50:27.324Z",
+    "text": "Hoje, {user}, será a Bombardeira Estelar 🦄 por 1 dia",
+    "name": "Bombardeira Estelar",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 6,
+    "imageId": "AgACAgEAAxkBAALM2mgDm_DrLkDh3N2t1CVvaQqXFjbEAALIrjEbCfUhRJozBJZra8vVAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T12:50:17.324Z",
+    "text": "Hoje, {user}, será a Zoey 🍭 por 1 dia",
+    "name": "Zoey",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 7,
+    "imageId": "AgACAgEAAxkBAALNLmgEAAFHSTCuD2l80WPBpglE4JEcqwACFa8xGwn1IUQmucAhFOkq9QEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-19T19:58:50.967Z",
+    "text": "Hoje, {user}, será a Vi 🦊 por 1 dia",
+    "name": "Vi",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 8,
+    "imageId": "AgACAgEAAxkBAALNMmgEAAHiLg_9LXCw1ElyVwHlV_hstAACFq8xGwn1IURXi01uL0-gjAEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-19T20:00:47.093Z",
+    "text": "Hoje, {user}, será a Trovoada 🦸🏽‍♀️ por 1 dia",
+    "name": "Trovoada",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 9,
+    "imageId": "AgACAgEAAxkBAALNNWgEAUuWNSfTdRUUaE4b7iFth2biAAIXrzEbCfUhRLI0-48GXXr4AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T20:02:30.032Z",
+    "text": "Hoje, {user}, será a Tempestade 🌬 por 1 dia",
+    "name": "Tempestade",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 10,
+    "imageId": "AgACAgEAAxkBAALNOGgEAZPcf4oM3mvXqcbYmJVRtcDAAAIYrzEbCfUhRJ-TZ2ontwjnAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T20:03:41.555Z",
+    "text": "Hoje, {user}, será a Teknica Torta 🎨 por 1 dia",
+    "name": "Teknica Torta",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 11,
+    "imageId": "AgACAgEAAxkBAALNO2gEAeH0FP8OKurGDi1Dyot6EfMMAAIZrzEbCfUhRHiVB_F4zU0KAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T20:04:58.482Z",
+    "text": "Hoje, {user}, será a Skye ☁️ por 1 dia",
+    "name": "Sky",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 12,
+    "imageId": "AgACAgEAAxkBAALNP2gECXdcmCQIJ_f29CxNFETnePzvAAIbrzEbCfUhRFUoh0CKaNaNAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T20:37:59.442Z",
+    "text": "Hoje, {user}, será a Silenciosa ☯️ por 1 dia",
+    "name": "Silenciosa",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 13,
+    "imageId": "AgACAgEAAxkBAALNamgELUwYwhpf0-ZPYzh1grj2LP_5AAKgrTEbCfUpRJWQl3TpMEcpAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:10:24.307Z",
+    "text": "Hoje, {user}, será a Saqueadora Renegada 😎 por 1 dia",
+    "name": "Saqueadora Renegada",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 14,
+    "imageId": "AgACAgEAAxkBAALNbWgELaONJCaRrc1BxxjtV4ZVxz0gAAKhrTEbCfUpRD1-dFUQyW-8AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:11:30.585Z",
+    "text": "Hoje, {user}, será a Rue 🤔 por 1 dia",
+    "name": "Rue",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 15,
+    "imageId": "AgACAgEAAxkBAALNcGgELdby0oIlYUga_wEZFRtJDST5AAKirTEbCfUpRMr_UDASfDFpAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:12:32.213Z",
+    "text": "Hoje, {user}, será a Rubi das Sombras 🖤 por 1 dia",
+    "name": "Rubi das Sombras",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 16,
+    "imageId": "AgACAgEAAxkBAALNc2gELgtvzbnycTuHe4zM5yzo_JkfAAKjrTEbCfUpRC37Adh5K2JJAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:13:21.645Z",
+    "text": "Hoje, {user}, será a Rubi ❤️ por 1 dia",
+    "name": "Rubi",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 17,
+    "imageId": "AgACAgEAAxkBAALNdmgELklmq449RFoDdhOcKFr76pTyAAKkrTEbCfUpRN6qBX2989AuAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:14:24.894Z",
+    "text": "Hoje, {user}, será a Renda 🤡 por 1 dia",
+    "name": "Renda",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 18,
+    "imageId": "AgACAgEAAxkBAALNeWgELpG9rRR7sPlqXObiCMue85QuAAKlrTEbCfUpRMSf1dYYBFIWAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:15:35.994Z",
+    "text": "Hoje, {user}, será a Ravena 👿 por 1 dia",
+    "name": "Ravena",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 19,
+    "imageId": "AgACAgEAAxkBAALNfWgELsyuiH6BfxlFTRLTZTt7KvQ_AAIhrjEb7J0oRMLQkJ3wU0jVAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:16:42.303Z",
+    "text": "Hoje, {user}, será a Pijama Gourmet 🍔🍟 por 1 dia",
+    "name": "Pijama Gourmet",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 20,
+    "imageId": "AgACAgEAAxkBAALNgmgELxkj_sSTO_GwTaXHg8mpdTzHAAKvrDEb1xEoRLwFVKeDb-0cAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:17:50.057Z",
+    "text": "Hoje, {user}, será a Pepper Thorne 🎸 por 1 dia",
+    "name": "Pepper Thorne",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 21,
+    "imageId": "AgACAgEAAxkBAALNhmgEMBelJn_lf3ZUwLUHPYDEGtSNAAJcrjEb7J0oRKv3WhaOquB2AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:22:09.906Z",
+    "text": "Hoje, {user}, será a Patrulheira Espinhosa 🌵 por 1 dia",
+    "name": "Patrulheira Espinhosa",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 22,
+    "imageId": "AgACAgEAAxkBAALNi2gEMUyWAVnHWG7g35aOL_225PozAAL7rDEb7J0oRMHRIIq_F03EAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:27:36.592Z",
+    "text": "Hoje, {user}, será a Patrulheira Carniçal 🧟‍♀️ por 1 dia",
+    "name": "Patrulheira Carniçal",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 23,
+    "imageId": "AgACAgEAAxkBAALNkGgEMgoEUYz81HU08E0lrdCeQEt5AAJ6rTEb7J0oRJfXtxATmy7dAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:30:21.352Z",
+    "text": "Hoje, {user}, será a Patife 👩🏻‍🏭 por 1 dia",
+    "name": "Patife",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 24,
+    "imageId": "AgACAgEAAxkBAALNlWgEMqFWBqvTcs6IWSI0FSLhAAGYEgACDK8xG-ydKEQzfFZqQTLESQEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-19T23:32:53.787Z",
+    "text": "Hoje, {user}, será A Paradigma 🕵🏻‍♀️ por 1 dia",
+    "name": "A Paradigma",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 25,
+    "imageId": "AgACAgEAAxkBAALNmmgEM5wzXtYFIIViTjzzCKXVffQpAAIOsTEb7J0oRBoMlbQpTR4VAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:37:03.940Z",
+    "text": "Hoje, {user}, será a Mulher Gato 😽 por 1 dia",
+    "name": "Mulher Gato",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 26,
+    "imageId": "AgACAgEAAxkBAALNn2gENEgr8AW1xRrHAAFJqh_r3UfYbwACGa8xG-ydKEQ-ZC3OPr2RbwEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-19T23:39:55.250Z",
+    "text": "Hoje, {user}, será a Medicina 💉 por 1 dia",
+    "name": "Medicina",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 27,
+    "imageId": "AgACAgEAAxkBAALNpGgENOhjAw627DWWHp4YaUc_fhT3AAI_rjEb7J0oRLiZ1QIeDCw6AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:42:37.933Z",
+    "text": "Hoje, {user}, será a Luxo 🥇 por 1 dia",
+    "name": "Luxo",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 28,
+    "imageId": "AgACAgEAAxkBAALNqWgENZ_CGZtW6kEcXXHUsL2U3PqhAAK_rDEbl4QgRKg83_5f_phiAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-19T23:45:38.824Z",
+    "text": "Hoje, {user}, será a Lince 😼 por 1 dia",
+    "name": "Lince",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 29,
+    "imageId": "AgACAgEAAxkBAALOYWgH-j-zGd6Cq9MswPu4TOBZmue6AAI4rTEb7J0oRKgAAVCW7w-8AgEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-22T20:21:36.327Z",
+    "text": "Hoje, {user}, será a Líder da Equipe Azul 💪 por 1 dia",
+    "name": "Líder da Equipe Azul",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 30,
+    "imageId": "AgACAgEAAxkBAALOZGgH-nP-VddL6sl6Oilvqgsyh8lYAAKZsDEb7J0oRICDdX7AOyiHAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:22:30.383Z",
+    "text": " Hoje, {user}, será a Lexa 🥺 por 1 dia",
+    "name": "Lexa",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 31,
+    "imageId": "AgACAgEAAxkBAALOaWgH-qUlPjHr0_kP8j2mg7JffQGGAALlsDEb7J0oRCJL_MLBsa66AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:23:13.681Z",
+    "text": " Hoje, {user}, será a Lara Croft 🔺🔺 por 1 dia",
+    "name": "Lara Croft",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 32,
+    "imageId": "AgACAgEAAxkBAALObGgH-t97fC_ctQHFfeR_Yxula9dwAAL2rzEb7J0oRBso24rhaajRAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:24:10.250Z",
+    "text": "Hoje, {user}, será a Kyra 👩🏻‍🦳 por 1 dia",
+    "name": "Kyra",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 33,
+    "imageId": "AgACAgEAAxkBAALOb2gH-xD1wyLf06NvXhRVtoTX7zLgAALgrzEb7J0oRPiXGD75uoUbAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:24:57.318Z",
+    "text": "Hoje, {user}, será a Jules 🔧 por 1 dia",
+    "name": "Jules",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 34,
+    "imageId": "AgACAgEAAxkBAALOcmgH-zuFsqFq8R0pqnYY7fqVqZAWAALXrDEb1xEoRENOP6J1zp91AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:25:41.350Z",
+    "text": "Hoje, {user}, será a Joyce 🌈 por 1 dia",
+    "name": "Joyce",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 35,
+    "imageId": "AgACAgEAAx0CRoOdDgABIElaaAf7bjZ1vja99QABIssAAY70GP4zQQAC4LAxG-ydKERUnsVbrGRb6QEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-22T20:26:42.784Z",
+    "text": "Hoje, {user}, será a Isabelle 🤓 por 1 dia",
+    "name": "Isabelle",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 36,
+    "imageId": "AgACAgEAAxkBAALOeGgH-6oDjdruS-9tvqTQu2s0dWM8AAKjrDEb1xEoRMTeMkpw-_9KAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:27:32.748Z",
+    "text": "Hoje, {user}, será a Ícone Modena 🚘 por 1 dia",
+    "name": "Ícone Modena",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 37,
+    "imageId": "AgACAgEAAxkBAALOe2gH-88HZYf37TTfPfqXQKoZ2pHsAAJosDEb7J0oRJ3RjsjgHbWmAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:28:09.324Z",
+    "text": "Hoje, {user}, será a Hera Venenosa 🌷 por 1 dia",
+    "name": "Hera Venenosa",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 38,
+    "imageId": "AgACAgEAAxkBAALOfmgH-_6gD-MG77n-zCAHWWpqOwZ1AAL3rTEb7J0oRNOWo2E4CDA8AQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:28:59.082Z",
+    "text": "Hoje, {user}, será a Guarda-caveira 💀 por 1 dia",
+    "name": "Guarda-caveira",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 39,
+    "imageId": "AgACAgEAAxkBAALOgWgH_CuC_-t48pGubFszJ2fDRSvrAAKTsDEb7J0oRPkZpdprwNxBAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-22T20:29:38.209Z",
+    "text": "Hoje, {user}, será a Galaxia 🌌 por 1 dia",
+    "name": "Galaxia",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 40,
+    "imageId": "AgACAgEAAxkBAALOhGgH_FVaJl9CK2z5Jz_HtRwsRB03AAKArjEb7J0oRC7EvM4h0_YAAQEAAwIAA3kAAzYE",
+    "dateAdded": "2025-04-22T20:30:20.459Z",
+    "text": "Hoje, {user}, será a Estrela do Mar 🌟 por 1 dia",
+    "name": "Estrela do Mar",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  },
+  {
+    "id": 41,
+    "imageId": "AgACAgEAAxkBAALO42gI6lUdQHJDGRu-yqIVG1Nl4rCqAALurjEb7J0oRIMnPEv8BQ2jAQADAgADeQADNgQ",
+    "dateAdded": "2025-04-23T13:26:10.693Z",
+    "text": "Hoje, {user}, será a Estrelada ✨ por 1 dia",
+    "name": "Estrelada",
+    "status": true,
+    "adminName": "c3bola",
+    "adminId": 121823278
+  }
+]

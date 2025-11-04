@@ -1,0 +1,48 @@
+{
+  "date": "Tue Nov 04 2025",
+  "ranking": {
+    "121823278": {
+      "name": "C3bola",
+      "wins": 1
+    },
+    "712970135": {
+      "name": "Virginia",
+      "wins": 1
+    }
+  },
+  "statistics": {
+    "totalDuels": 5,
+    "completedDuels": 4,
+    "abandonedDuels": 0,
+    "players": {
+      "121823278": {
+        "name": "C3bola",
+        "duelsStarted": 5,
+        "duelsCompleted": 4,
+        "duelsAbandoned": 0,
+        "wins": 0
+      },
+      "712970135": {
+        "name": "Virginia",
+        "duelsStarted": 3,
+        "duelsCompleted": 2,
+        "duelsAbandoned": 0,
+        "wins": 0
+      },
+      "907115429": {
+        "name": "Honorio",
+        "duelsStarted": 1,
+        "duelsCompleted": 1,
+        "duelsAbandoned": 0,
+        "wins": 0
+      },
+      "1183899386": {
+        "name": "Rafael",
+        "duelsStarted": 1,
+        "duelsCompleted": 1,
+        "duelsAbandoned": 0,
+        "wins": 0
+      }
+    }
+  }
+}
