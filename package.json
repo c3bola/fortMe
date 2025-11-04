@@ -1,0 +1,26 @@
+{
+    "name": "guardaoibot",
+    "description": "First Telegram Bot API node.js library",
+    "version": "0.0.2",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/c3bola/guardaOiBot.git"
+    },
+    "main": "./fortMe.js",
+    "keywords": [
+        "telegram",
+        "nodejs",
+        "node.js",
+        "telegram bot",
+        "fortnite",
+        "api"
+    ],
+    "author": "C3bola <fnc3bola@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "express": "^4.17.1",
+        "node-cron": "^3.0.0",
+        "telegraf": "^4.12.2"
+    }
+}
