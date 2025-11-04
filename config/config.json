@@ -1,0 +1,88 @@
+{
+  "apiKey": "",
+  "admins": [
+    {
+      "name": "C3bola",
+      "id": 121823278
+    },
+    {
+      "id": 1076700588,
+      "name": "Insano"
+    }
+  ],
+  "logGroup": {
+    "name": "Logs Temp",
+    "status": true,
+    "id": -1002578635990,
+    "topic": 716
+  },
+  "cronJobs": {
+    "fortgirls": {
+      "status": true,
+      "schedule": "19 48 11 * * *"
+    },
+    "tryhard": {
+      "status": true,
+      "schedule": "49 35 11 * * *"
+    },
+    "jonesy": {
+      "status": false,
+      "schedule": "0 0 22 * * *"
+    },
+    "x1promotion": {
+      "status": true,
+      "schedule": "0 30 14 * * *"
+    },
+    "fortme": {
+      "status": false,
+      "schedule": "0 0 23 * * *"
+    }
+  },
+  "groups": [
+    {
+      "id": -1002564342427,
+      "name": "Teste privado",
+      "status": true
+    }
+  ],
+  "tryhardme": {
+    "tryhard": {
+      "normaly": {
+        "status": true,
+        "text": "🌟 {username} foi o mais Try Hard do dia com {value}%! 🌟",
+        "imageId": "CgACAgEAAxkDAALLn2gDEIap2sWaS_jUDs-MrI3HwDCVAAJ2BAAC7EvARx8jRsp3VPTfNgQ",
+        "mediaType": "animation"
+      },
+      "hundred": {
+        "status": true,
+        "text": "🔥 {username} atingiu 100% Try Hard! 🔥",
+        "imageId": "CgACAgEAAxkBAALLj2gDEgYjvktG7pWkDINzxP25v744AAK6AwACKFLIR3sev6nqy1KwNgQ",
+        "mediaType": "animation"
+      }
+    },
+    "banana": {
+      "normaly": {
+        "status": true,
+        "text": "🍌 {username} foi o mais Embananado do dia com {value}%! 🍌",
+        "imageId": "CgACAgEAAxkDAALLnWgDEjHyqgdqk4fRGH7LBOxi6YqgAAK4AwACKFLIR500QjlS5xDUNgQ",
+        "mediaType": "animation"
+      },
+      "hundred": {
+        "status": true,
+        "text": "😂 {username} atingiu 100% Embananado! 😂",
+        "imageId": "CgACAgQAAxkBAALO8mgI7cQELRUeZTAbGxc-X9iR2q2lAAIoBwACfwt8UBg2Bk25-mDqNgQ",
+        "mediaType": "animation"
+      }
+    }
+  },
+  "commands": {
+    "tryhardme": true,
+    "help": true,
+    "fortme": false,
+    "fortgirl": true,
+    "jonesyme": false,
+    "x1": true,
+    "ranking": true,
+    "x1stats": true
+  }
+}
