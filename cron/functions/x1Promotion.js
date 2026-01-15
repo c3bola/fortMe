@@ -2,6 +2,32 @@ const fs = require('fs');
 const path = require('path');
 const config = require('../../config/config');
 
+// Função para enviar mensagem com retry e respeito ao rate limit
+async function sendMessageWithRetry(bot, chatId, content, options = {}, maxRetries = 3) {
+  let attempt = 0;
+  
+  while (attempt < maxRetries) {
+    try {
+      return await bot.telegram.sendMessage(chatId, content, options);
+    } catch (error) {
+      attempt++;
+      
+      // Verificar se é erro de rate limit
+      if (error.response && error.response.parameters && error.response.parameters.retry_after) {
+        const retryAfter = error.response.parameters.retry_after;
+        console.log(`[WARNING] Rate limit atingido. Aguardando ${retryAfter} segundos antes de retentar...`);
+        await new Promise(resolve => setTimeout(resolve, (retryAfter + 1) * 1000));
+      } else if (attempt < maxRetries) {
+        // Erro genérico, aguardar 2 segundos
+        console.error(`[ERROR] Falha ao enviar mensagem (tentativa ${attempt}/${maxRetries}):`, error.message);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
 // Frases promocionais para X1
 const x1PromotionalPhrases = [
   "⚔️ <b>Hora do X1!</b> ⚔️\n\nJá mandou seu X1 hoje? Desafie alguém com /x1 e prove que você não é embananado! 🍌\n\n💥 <i>Responda a mensagem de alguém e digite /x1!</i>",
@@ -21,7 +47,19 @@ module.exports = async (bot) => {
 
   try {
     // Filtrar grupos ativos do arquivo de configuração
-    const activeGroups = config.groups ? config.groups.filter(group => group.status) : [];
+    // Carregar grupos do broadcast.json
+    const broadcastPath = path.join(__dirname, '../../database/broadcast.json');
+    let activeGroups = [];
+    if (fs.existsSync(broadcastPath)) {
+      const broadcastData = JSON.parse(fs.readFileSync(broadcastPath, 'utf8'));
+      if (broadcastData.groups) {
+        activeGroups = Object.values(broadcastData.groups).map(g => ({
+          id: typeof g.id === 'string' ? parseInt(g.id, 10) : g.id,
+          name: g.name,
+          status: true
+        }));
+      }
+    }
 
     if (activeGroups.length === 0) {
       console.log('[INFO] Nenhum grupo ativo encontrado para promoção de X1.');
@@ -36,17 +74,19 @@ module.exports = async (bot) => {
       try {
         console.log(`[INFO] Enviando promoção de X1 para o grupo ${group.id} (${group.name})...`);
         
-        await bot.telegram.sendMessage(group.id, randomPhrase, {
+        await sendMessageWithRetry(bot, group.id, randomPhrase, {
           parse_mode: 'HTML'
         });
 
-        console.log(`[INFO] Promoção de X1 enviada com sucesso para ${group.name}`);
+        console.log(`[SUCCESS] Promoção de X1 enviada com sucesso para ${group.name}`);
         
-        // Pequeno delay entre envios para evitar rate limit
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Delay entre grupos para respeitar rate limit (30 msgs/segundo para grupos diferentes)
+        // Com margem de segurança, usar 1.5-2 segundos entre grupos
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
       } catch (error) {
         console.error(`[ERROR] Falha ao enviar promoção de X1 para o grupo ${group.name} (${group.id}):`, error.message);
+        // Continuar para o próximo grupo mesmo se houver erro
       }
     }
 

@@ -1,5 +1,4 @@
 {
-  "apiKey": "",
   "admins": [
     {
       "name": "C3bola",
@@ -38,13 +37,6 @@
       "schedule": "0 0 23 * * *"
     }
   },
-  "groups": [
-    {
-      "id": -1002564342427,
-      "name": "Teste privado",
-      "status": true
-    }
-  ],
   "tryhardme": {
     "tryhard": {
       "normaly": {
@@ -78,9 +70,9 @@
   "commands": {
     "tryhardme": true,
     "help": true,
-    "fortme": false,
+    "fortme": true,
     "fortgirl": true,
-    "jonesyme": false,
+    "jonesyme": true,
     "x1": true,
     "ranking": true,
     "x1stats": true

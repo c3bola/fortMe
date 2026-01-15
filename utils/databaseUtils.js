@@ -8,17 +8,44 @@ const path = require('path');
  */
 function readDatabase(filePath) {
   if (!fs.existsSync(filePath)) {
+    console.log(`[INFO] Arquivo não encontrado: ${filePath}. Retornando objeto vazio.`);
     return {};
   }
 
   try {
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    if (typeof data !== 'object') {
-      throw new Error('Dados inválidos no arquivo JSON.');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Verificar se o arquivo está vazio
+    if (!fileContent || fileContent.trim() === '') {
+      console.error(`[ERROR] Arquivo vazio detectado: ${filePath}`);
+      return {};
     }
+    
+    const data = JSON.parse(fileContent);
+    
+    if (typeof data !== 'object' || data === null) {
+      console.error(`[ERROR] Dados inválidos no arquivo JSON: ${filePath}`);
+      return {};
+    }
+    
+    // Log para arrays (imagens)
+    if (Array.isArray(data)) {
+      console.log(`[DEBUG] Arquivo ${path.basename(filePath)} carregado: ${data.length} itens`);
+      
+      // Validar se há itens com imageId inválido
+      const invalidItems = data.filter(item => !item.imageId || typeof item.imageId !== 'string');
+      if (invalidItems.length > 0) {
+        console.warn(`[WARNING] ${invalidItems.length} itens com imageId inválido em ${path.basename(filePath)}`);
+        invalidItems.forEach((item, index) => {
+          console.warn(`[WARNING] Item inválido #${index + 1}:`, JSON.stringify(item));
+        });
+      }
+    }
+    
     return data;
   } catch (error) {
     console.error(`[ERROR] Falha ao ler o arquivo ${filePath}:`, error.message);
+    console.error(`[ERROR] Stack trace:`, error.stack);
     return {};
   }
 }
