@@ -1,50 +1,53 @@
-const fs = require('fs');
-const path = require('path');
-
-// Armazenar duelos ativos em memória
-const activeDuels = new Map();
-
-// Caminho para o banco de dados de ranking diário
-const dailyRankingPath = path.join(__dirname, '../../database/dailyx1.json');
-
-// Tempo limite para duelos (30 minutos)
-const DUEL_TIMEOUT = 30 * 60 * 1000;
-
-// Frases para quando alguém joga sozinho
+// Frases para quando o usuário tenta /x1 sozinho ou desafia a si mesmo
 const soloLosePhrases = [
-  "<a href='tg://user?id={userId}'>{username}</a> entrou no X1 sozinho e perdeu pra própria sombra. 👻",
-  "<a href='tg://user?id={userId}'>{username}</a> tentou jogar contra o vento... e perdeu feio. 💨",
-  "<a href='tg://user?id={userId}'>{username}</a> desafiou o próprio reflexo no espelho e saiu chorando. 😭",
-  "<a href='tg://user?id={userId}'>{username}</a> jogou X1 contra a imaginação e tomou uma surra épica. 🤡",
-  "<a href='tg://user?id={userId}'>{username}</a> tentou duelar com sua própria sombra... A sombra ganhou. 🌚",
-  "<a href='tg://user?id={userId}'>{username}</a> fez um X1 solo tão ruim que até o Luigi riu. 😂",
-  "<a href='tg://user?id={userId}'>{username}</a> desafiou o ar e mesmo assim perdeu. Que vergonha! 🌬️",
-  "<a href='tg://user?id={userId}'>{username}</a> tentou jogar contra ninguém e perdeu para todo mundo. 🤦‍♂️",
-  "<a href='tg://user?id={userId}'>{username}</a> fez um duelo tão solitário que até os bots fugiram. 🤖",
-  "<a href='tg://user?id={userId}'>{username}</a> jogou X1 sozinho e perdeu para o próprio dedo mindinho. 👶"
+  '😅 <a href="tg://user?id={userId}">{username}</a> tentou duelar sozinho e perdeu para o próprio ego! Tente desafiar alguém de verdade!',
+  '🙃 {username}, X1 solo não vale! Chame alguém para a treta!',
+  '😂 {username} tentou desafiar a si mesmo e perdeu! Melhor chamar um amigo.',
+  '🪞 {username} duelou com o espelho e... perdeu! Escolha um adversário real.',
+  '🤦‍♂️ {username}, não dá pra duelar sozinho! Marca alguém aí!',
+  '👻 {username} tentou duelar com um fantasma. Não deu certo!',
+  '🥲 {username} foi rejeitado até pelo bot. Chama alguém pro X1!',
+  '🫥 {username} tentou X1 solo. O bot ficou com vergonha alheia.',
+  '😬 {username}, desafiar a si mesmo não conta! Bora pra um X1 de verdade!',
+  '🦾 {username} tentou X1 contra o próprio dedo. Não funcionou!',
+  '🫣 {username} duelou sozinho e perdeu. Chama alguém pra não passar vergonha!',
+  '🤷‍♂️ {username}, X1 precisa de dois! Marca um amigo!',
+  '🫡 {username} tentou X1 solo. O bot recomenda terapia!',
+  '😹 {username} duelou sozinho e perdeu até pra sorte!',
+  '🫠 {username} tentou X1 solo. O bot ficou sem reação!'
 ];
+// Utilitário para buscar dados tryhard/banana do dia
+function getTryhardData(groupId, userId) {
+  try {
+    const filePath = path.join(__dirname, '../../database/dalytryhard.json');
+    if (!fs.existsSync(filePath)) return null;
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const today = new Date().toISOString().split('T')[0];
+    if (!data[groupId] || !data[groupId][today] || !data[groupId][today][userId]) return null;
+    return data[groupId][today][userId];
+  } catch (e) {
+    return null;
+  }
+}
 
-// Frases para abandono de duelos
-const abandonmentPhrases = {
-  singleAbandon: [
-    "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou <a href='tg://user?id={abandonerId}'>{abandonerName}</a> por 30 minutos... e ele fugiu! 🏃‍♂️",
-    "<a href='tg://user?id={waiterId}'>{waiterName}</a> ficou plantado esperando <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que sumiu no mundo! 🌍",
-    "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> deixou <a href='tg://user?id={waiterId}'>{waiterName}</a> falando sozinho por 30 minutos. Que vacilo! 😤",
-    "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou tanto <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que criou barba! 🧔",
-    "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> fugiu mais rápido que ladrão de galinha. <a href='tg://user?id={waiterId}'>{waiterName}</a> venceu por W.O.! 🐓"
-  ],
-  doubleAbandon: [
-    "O X1 foi tão parado que virou sessão de meditação. 🧘‍♂️",
-    "Ambos esqueceram do X1. A paz venceu. ☮️",
-    "O duelo foi tão zen que ninguém apareceu para brigar. 🕯️",
-    "Parece que os dois foram tomar um café e esqueceram do X1. ☕",
-    "O X1 mais silencioso da história. Até o crickets pararam de fazer barulho. 🦗",
-    "Um duelo tão fantasma que nem os fantasmas apareceram. 👻",
-    "O X1 virou hide and seek, mas ninguém procurou ninguém. 🙈",
-    "Esse foi o X1 mais pacífico da história. Gandhi ficaria orgulhoso. ✌️"
-  ]
-};
-
+// Frases temáticas para lógica B (lobby especial)
+const duelBonusPhrases = [
+  '🎮 Lobby Especial! {winner} estava {winnerTryhard}% tryhard, mas escorregou na banana do {loser} ({loserBanana}% embananado) e perdeu feio! 🍌',
+  '🍌 O embananado {winner} surpreendeu e venceu o tryhard {loser} no lobby bonus! Fortnite é imprevisível!',
+  '🔥 {loser} estava se achando o pro player ({loserTryhard}% tryhard), mas foi trollado pelo azar e caiu do ônibus! 😂',
+  '🥇 {winner} venceu no lobby especial, mesmo com {winnerBanana}% de trapalhadas!',
+  '🏆 {loser} tentou ser tryhard ({loserTryhard}%), mas o embananado {winner} levou a melhor!',
+  '🍌 {winner} ativou o modo banana suprema e derrubou o tryhard {loser}!',
+  '🎲 Sorte troll! {winner} ganhou no lobby bonus, mesmo sendo mais embananado!',
+  '🤣 {loser} estava 99% tryhard, mas tropeçou no próprio loot e perdeu para o {winner}!',
+  '🏅 {winner} venceu no evento especial, mostrando que banana também ganha partida!',
+  '🥑 {loser} foi tryhard demais e se embananou, vitória para {winner}!',
+  '🥳 {winner} ganhou no lobby especial, Fortnite é zoeira até no X1!',
+  '🥷 {loser} tentou ser ninja ({loserTryhard}%), mas o azar foi maior!',
+  '🥔 {winner} venceu no lobby bonus, mostrando que até batata ganha de tryhard!',
+  '🏹 {loser} errou o tiro final, vitória embananada para {winner}!',
+  '🏖️ {winner} só queria brincar, mas acabou ganhando do tryhard {loser} no evento especial!'
+];
 // Frases para resultados de duelos
 const duelResults = {
   attack_vs_flee: [
@@ -78,44 +81,45 @@ const duelResults = {
     "🤡 QUE FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> errou tão feio que virou meme! <a href='tg://user?id={winnerId}'>{winnerName}</a> ganhou de graça! 📱"
   ]
 };
+const fs = require('fs');
+const path = require('path');
+// Caminho para o banco de dados de ranking diário
+const dailyRankingPath = path.join(__dirname, '../../database/dailyx1.json');
 
-// Função para carregar ranking diário
-function loadDailyRanking() {
+// Tempo limite para duelos (30 minutos)
+const DUEL_TIMEOUT = 30 * 60 * 1000;
+
+const abandonmentPhrases = {
+  singleAbandon: [
+    "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou <a href='tg://user?id={abandonerId}'>{abandonerName}</a> por 30 minutos... e ele fugiu! 🏃‍♂️",
+    "<a href='tg://user?id={waiterId}'>{waiterName}</a> ficou plantado esperando <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que sumiu no mundo! 🌍",
+    "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> deixou <a href='tg://user?id={waiterId}'>{waiterName}</a> falando sozinho por 30 minutos. Que vacilo! 😤",
+    "<a href='tg://user?id={waiterId}'>{waiterName}</a> esperou tanto <a href='tg://user?id={abandonerId}'>{abandonerName}</a> que criou barba! 🧔",
+    "<a href='tg://user?id={abandonerId}'>{abandonerName}</a> fugiu mais rápido que ladrão de galinha. <a href='tg://user?id={waiterId}'>{waiterName}</a> venceu por W.O.! 🐓"
+  ],
+  doubleAbandon: [
+    "O X1 foi tão parado que virou sessão de meditação. 🧘‍♂️",
+    "Ambos esqueceram do X1. A paz venceu. ☮️",
+    "O duelo foi tão zen que ninguém apareceu para brigar. 🕯️",
+    "Parece que os dois foram tomar um café e esqueceram do X1. ☕",
+    "O X1 mais silencioso da história. Até o crickets pararam de fazer barulho. 🦗"
+  ]
+};
+
+// Armazenar duelos ativos em memória
+const activeDuels = new Map();
+
+// Função para carregar ranking diário por grupo e data
+function loadDailyRanking(groupId) {
   try {
+    let data = {};
     if (fs.existsSync(dailyRankingPath)) {
-      const data = JSON.parse(fs.readFileSync(dailyRankingPath, 'utf8'));
-      const today = new Date().toDateString();
-      
-      // Se é um novo dia, reseta o ranking
-      if (data.date !== today) {
-        const newData = { 
-          date: today, 
-          ranking: {},
-          statistics: {
-            totalDuels: 0,
-            completedDuels: 0,
-            abandonedDuels: 0,
-            players: {}
-          }
-        };
-        fs.writeFileSync(dailyRankingPath, JSON.stringify(newData, null, 2));
-        return newData;
-      }
-      
-      // Garantir que statistics existe
-      if (!data.statistics) {
-        data.statistics = {
-          totalDuels: 0,
-          completedDuels: 0,
-          abandonedDuels: 0,
-          players: {}
-        };
-      }
-      
-      return data;
-    } else {
-      const newData = { 
-        date: new Date().toDateString(), 
+      data = JSON.parse(fs.readFileSync(dailyRankingPath, 'utf8'));
+    }
+    const today = new Date().toISOString().split('T')[0];
+    if (!data[today]) data[today] = {};
+    if (!data[today][groupId]) {
+      data[today][groupId] = {
         ranking: {},
         statistics: {
           totalDuels: 0,
@@ -124,59 +128,72 @@ function loadDailyRanking() {
           players: {}
         }
       };
-      fs.writeFileSync(dailyRankingPath, JSON.stringify(newData, null, 2));
-      return newData;
     }
+    return { data, today, group: data[today][groupId] };
   } catch (error) {
     console.error('[ERROR] Erro ao carregar ranking diário:', error.message);
-    return { 
-      date: new Date().toDateString(), 
-      ranking: {},
-      statistics: {
-        totalDuels: 0,
-        completedDuels: 0,
-        abandonedDuels: 0,
-        players: {}
+    const today = new Date().toISOString().split('T')[0];
+    return {
+      data: {
+        [today]: {
+          [groupId]: {
+            ranking: {},
+            statistics: {
+              totalDuels: 0,
+              completedDuels: 0,
+              abandonedDuels: 0,
+              players: {}
+            }
+          }
+        }
+      },
+      today,
+      group: {
+        ranking: {},
+        statistics: {
+          totalDuels: 0,
+          completedDuels: 0,
+          abandonedDuels: 0,
+          players: {}
+        }
       }
     };
   }
 }
 
-// Função para salvar vitória no ranking
-function saveWin(userId, userName) {
+// Função para salvar vitória no ranking por grupo
+function saveWin(groupId, userId, userName) {
   try {
-    const data = loadDailyRanking();
-    if (!data.ranking[userId]) {
-      data.ranking[userId] = { name: userName, wins: 0 };
+    const { data, today, group } = loadDailyRanking(groupId);
+    if (!group.ranking[userId]) {
+      group.ranking[userId] = { name: userName, wins: 0 };
     }
-    data.ranking[userId].wins++;
-    data.ranking[userId].name = userName; // Atualiza o nome caso tenha mudado
+    group.ranking[userId].wins++;
+    group.ranking[userId].name = userName;
+    data[today][groupId] = group;
     fs.writeFileSync(dailyRankingPath, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('[ERROR] Erro ao salvar vitória:', error.message);
   }
 }
 
-// Função para salvar estatísticas
-function saveStatistics(type, player1Id = null, player1Name = null, player2Id = null, player2Name = null) {
+// Função para salvar estatísticas por grupo
+function saveStatistics(groupId, type, player1Id = null, player1Name = null, player2Id = null, player2Name = null) {
   try {
-    const data = loadDailyRanking();
-    
+    const { data, today, group } = loadDailyRanking(groupId);
     // Incrementar contadores globais
     if (type === 'started') {
-      data.statistics.totalDuels++;
+      group.statistics.totalDuels++;
     } else if (type === 'completed') {
-      data.statistics.completedDuels++;
+      group.statistics.completedDuels++;
     } else if (type === 'abandoned') {
-      data.statistics.abandonedDuels++;
+      group.statistics.abandonedDuels++;
     }
-    
     // Atualizar estatísticas dos jogadores
     const updatePlayerStats = (playerId, playerName, statType) => {
       if (!playerId) return;
-      
-      if (!data.statistics.players[playerId]) {
-        data.statistics.players[playerId] = {
+      if (!group.statistics.players[playerId]) {
+        group.statistics.players[playerId] = {
           name: playerName,
           duelsStarted: 0,
           duelsCompleted: 0,
@@ -184,20 +201,17 @@ function saveStatistics(type, player1Id = null, player1Name = null, player2Id = 
           wins: 0
         };
       }
-      
-      data.statistics.players[playerId].name = playerName; // Atualiza nome
-      
+      group.statistics.players[playerId].name = playerName;
       if (statType === 'started') {
-        data.statistics.players[playerId].duelsStarted++;
+        group.statistics.players[playerId].duelsStarted++;
       } else if (statType === 'completed') {
-        data.statistics.players[playerId].duelsCompleted++;
+        group.statistics.players[playerId].duelsCompleted++;
       } else if (statType === 'abandoned') {
-        data.statistics.players[playerId].duelsAbandoned++;
+        group.statistics.players[playerId].duelsAbandoned++;
       } else if (statType === 'win') {
-        data.statistics.players[playerId].wins++;
+        group.statistics.players[playerId].wins++;
       }
     };
-    
     // Aplicar estatísticas baseadas no tipo
     if (type === 'started' && player1Id && player2Id) {
       updatePlayerStats(player1Id, player1Name, 'started');
@@ -211,12 +225,13 @@ function saveStatistics(type, player1Id = null, player1Name = null, player2Id = 
     } else if (type === 'win' && player1Id) {
       updatePlayerStats(player1Id, player1Name, 'win');
     }
-    
+    data[today][groupId] = group;
     fs.writeFileSync(dailyRankingPath, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('[ERROR] Erro ao salvar estatísticas:', error.message);
   }
 }
+
 
 // Função para formatar menção HTML
 function formatMention(userId, name) {
@@ -303,8 +318,7 @@ function processDuelResult(challengerId, challengerName, challengedId, challenge
     }
   }
   
-  // Salvar vitória no ranking
-  saveWin(winner.id, winner.name);
+  // Esta função não é mais usada diretamente, vitórias são salvas no callback
   
   return getRandomPhrase(duelResults[resultType], {
     winnerId: winner.id,
@@ -314,21 +328,51 @@ function processDuelResult(challengerId, challengerName, challengedId, challenge
   });
 }
 
+// Utilitário para enviar erro ao grupo de logs
+async function sendErrorToLogGroup(error, context) {
+  try {
+    const config = require('../../config/config');
+    if (config.logGroup && config.logGroup.status && config.logGroup.id) {
+      let msg = `❌ <b>Erro no comando /x1</b>\n`;
+      if (context) {
+        msg += `<b>Contexto:</b> ${context}\n`;
+      }
+      msg += `<pre>${(error && error.stack) ? error.stack : error}</pre>`;
+      const botApi = require('telegraf');
+      // Enviar mensagem para o grupo de logs
+      const bot = new botApi.Telegraf(config.apiKey);
+      await bot.telegram.sendMessage(config.logGroup.id, msg, { parse_mode: 'HTML', message_thread_id: config.logGroup.topic || undefined });
+    }
+  } catch (e) {
+    console.error('[ERROR] Falha ao enviar erro ao grupo de logs:', e.message);
+  }
+}
+
 module.exports = (bot) => {
   // Comando /x1
   bot.command('x1', async (ctx) => {
     try {
+      console.log('[DEBUG] /x1 chamado', {
+        chatId: ctx.chat?.id,
+        from: ctx.from?.id,
+        text: ctx.message?.text
+      });
       const message = ctx.message;
       const challenger = message.from;
+      console.log('[DEBUG] /x1 contexto inicial', {
+        isReply: !!message.reply_to_message,
+        challengerId: challenger?.id,
+        chatId: ctx.chat?.id
+      });
       
       // Verificar se é uma resposta a outra mensagem
       if (!message.reply_to_message) {
         // Jogar sozinho - usar frase aleatória
+        console.log('[DEBUG] /x1 não é reply, enviando frase solo');
         const phrase = getRandomPhrase(soloLosePhrases, {
           userId: challenger.id,
           username: challenger.first_name || challenger.username || 'Anônimo'
         });
-        
         return ctx.reply(phrase, { 
           parse_mode: 'HTML',
           reply_to_message_id: message.message_id
@@ -339,11 +383,11 @@ module.exports = (bot) => {
       
       // Verificar se não está tentando desafiar a si mesmo
       if (challenger.id === challenged.id) {
+        console.log('[DEBUG] /x1 desafiando a si mesmo');
         const phrase = getRandomPhrase(soloLosePhrases, {
           userId: challenger.id,
           username: challenger.first_name || challenger.username || 'Anônimo'
         });
-        
         return ctx.reply(phrase, { 
           parse_mode: 'HTML',
           reply_to_message_id: message.message_id
@@ -352,8 +396,9 @@ module.exports = (bot) => {
       
       // Verificar se já existe um duelo ativo entre estes usuários
       const duelKey = `${Math.min(challenger.id, challenged.id)}-${Math.max(challenger.id, challenged.id)}`;
-      
+      const groupId = String(ctx.chat.id);
       if (activeDuels.has(duelKey)) {
+        console.log('[DEBUG] /x1 duelo já ativo', { duelKey });
         return ctx.reply(
           `⚡ Já existe um duelo rolando entre ${formatMention(challenger.id, challenger.first_name)} e ${formatMention(challenged.id, challenged.first_name)}! Aguardem o resultado!`,
           { 
@@ -362,7 +407,6 @@ module.exports = (bot) => {
           }
         );
       }
-      
       // Criar novo duelo
       const duel = {
         challengerId: challenger.id,
@@ -374,13 +418,13 @@ module.exports = (bot) => {
         messageId: null,
         chatId: ctx.chat.id,
         startTime: new Date().getTime(),
-        originalMessageId: message.message_id
+        originalMessageId: message.message_id,
+        groupId
       };
-      
       activeDuels.set(duelKey, duel);
-      
+      console.log('[DEBUG] /x1 duelo criado', { duelKey, challenger: duel.challengerId, challenged: duel.challengedId, groupId });
       // Salvar estatística de duelo iniciado
-      saveStatistics('started', challenger.id, challenger.first_name, challenged.id, challenged.first_name);
+      saveStatistics(groupId, 'started', challenger.id, challenger.first_name, challenged.id, challenged.first_name);
       
       // Criar botões inline
       const keyboard = {
@@ -405,42 +449,36 @@ module.exports = (bot) => {
       );
       
       duel.messageId = duelMessage.message_id;
+      console.log('[DEBUG] /x1 mensagem de duelo enviada', { messageId: duel.messageId });
       
       // Remover duelo após 30 minutos se não for concluído
       setTimeout(() => {
         if (activeDuels.has(duelKey)) {
           const expiredDuel = activeDuels.get(duelKey);
           activeDuels.delete(duelKey);
-          
-          // Verificar quem participou e quem abandonou
           let message;
           if (expiredDuel.challengerAction && !expiredDuel.challengedAction) {
-            // Challenger participou, challenged abandonou
             message = getRandomPhrase(abandonmentPhrases.singleAbandon, {
               waiterId: expiredDuel.challengerId,
               waiterName: expiredDuel.challengerName,
               abandonerId: expiredDuel.challengedId,
               abandonerName: expiredDuel.challengedName
             });
-            saveWin(expiredDuel.challengerId, expiredDuel.challengerName);
-            saveStatistics('abandoned', expiredDuel.challengedId, expiredDuel.challengedName);
+            saveWin(expiredDuel.groupId, expiredDuel.challengerId, expiredDuel.challengerName);
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengedId, expiredDuel.challengedName);
           } else if (!expiredDuel.challengerAction && expiredDuel.challengedAction) {
-            // Challenged participou, challenger abandonou  
             message = getRandomPhrase(abandonmentPhrases.singleAbandon, {
               waiterId: expiredDuel.challengedId,
               waiterName: expiredDuel.challengedName,
               abandonerId: expiredDuel.challengerId,
               abandonerName: expiredDuel.challengerName
             });
-            saveWin(expiredDuel.challengedId, expiredDuel.challengedName);
-            saveStatistics('abandoned', expiredDuel.challengerId, expiredDuel.challengerName);
+            saveWin(expiredDuel.groupId, expiredDuel.challengedId, expiredDuel.challengedName);
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName);
           } else {
-            // Ambos abandonaram
             message = `⏰ <b>Duelo expirado!</b>\n\n${getRandomPhrase(abandonmentPhrases.doubleAbandon)}`;
-            saveStatistics('abandoned', expiredDuel.challengerId, expiredDuel.challengerName, expiredDuel.challengedId, expiredDuel.challengedName);
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName, expiredDuel.challengedId, expiredDuel.challengedName);
           }
-          
-          // Enviar mensagem de abandono como resposta ao comando original
           ctx.telegram.sendMessage(
             ctx.chat.id,
             message,
@@ -449,8 +487,6 @@ module.exports = (bot) => {
               reply_to_message_id: expiredDuel.originalMessageId
             }
           ).catch(() => {});
-          
-          // Remover botões da mensagem original
           ctx.telegram.editMessageReplyMarkup(
             ctx.chat.id,
             duelMessage.message_id,
@@ -461,15 +497,16 @@ module.exports = (bot) => {
       }, DUEL_TIMEOUT); // 30 minutos
       
     } catch (error) {
-      console.error('[ERROR] Erro no comando /x1:', error.message);
+      console.error('[ERROR] Erro no comando /x1:', error);
+      await sendErrorToLogGroup(error, '/x1');
       ctx.reply('❌ Ocorreu um erro ao iniciar o duelo. Tente novamente!', {
         reply_to_message_id: ctx.message.message_id
       });
     }
   });
   
-  // Handler para os botões do duelo
-  bot.on('callback_query', async (ctx) => {
+  // Handler para os botões do duelo (apenas x1_)
+  bot.action(/^x1_/, async (ctx) => {
     try {
       const data = ctx.callbackQuery.data;
       
@@ -511,41 +548,130 @@ module.exports = (bot) => {
       
       const actionEmojis = { attack: '⚔️', defend: '🛡️', flee: '💨' };
       
-      ctx.answerCbQuery(`Você escolheu: ${actionEmojis[action]} ${action === 'attack' ? 'Atacar' : action === 'defend' ? 'Defender' : 'Fugir'}!`);
+      ctx.answerCbQuery(`Você escolheu: ${actionEmojis[action]} ${action === 'attack' ? 'Atacar' : action === 'defend' ? 'Defender' : 'Fugir'}!`, { show_alert: true });
       
       // Verificar se ambos já escolheram
       if (duel.challengerAction && duel.challengedAction) {
-        // Processar resultado
-        const result = processDuelResult(
-          duel.challengerId,
-          duel.challengerName,
-          duel.challengedId,
-          duel.challengedName,
-          duel.challengerAction,
-          duel.challengedAction
-        );
-        
+        // Lógica especial: 50% de chance de ativar lobby temático se ambos tiverem dados tryhard/banana
+        const groupId = duel.groupId;
+        const today = new Date().toISOString().split('T')[0];
+        const challengerTryhard = getTryhardData(groupId, String(duel.challengerId));
+        const challengedTryhard = getTryhardData(groupId, String(duel.challengedId));
+        let useBonusLogic = false;
+        if (challengerTryhard && challengedTryhard && Math.random() < 0.5) {
+          useBonusLogic = true;
+        }
+        let duelResult;
+        let winner, loser;
+        if (useBonusLogic) {
+          // Escolhe vencedor aleatório
+          const players = [
+            { id: duel.challengerId, name: duel.challengerName, tryhard: challengerTryhard.tryhard, banana: challengerTryhard.banana },
+            { id: duel.challengedId, name: duel.challengedName, tryhard: challengedTryhard.tryhard, banana: challengedTryhard.banana }
+          ];
+          const winnerIndex = Math.floor(Math.random() * 2);
+          winner = players[winnerIndex];
+          loser = players[1 - winnerIndex];
+          // Escolhe frase temática
+          const phrase = duelBonusPhrases[Math.floor(Math.random() * duelBonusPhrases.length)];
+          duelResult = phrase
+            .replace(/{winner}/g, winner.name)
+            .replace(/{loser}/g, loser.name)
+            .replace(/{winnerTryhard}/g, winner.tryhard)
+            .replace(/{winnerBanana}/g, winner.banana)
+            .replace(/{loserTryhard}/g, loser.tryhard)
+            .replace(/{loserBanana}/g, loser.banana);
+          duelResult = `🎉 <b>LOBBY ESPECIAL ATIVADO!</b> 🎉\n${duelResult}`;
+          console.log('[DEBUG] Duelo bônus - Salvando vitória', { groupId: duel.groupId, winnerId: winner.id, winnerName: winner.name });
+        } else {
+          // Lógica normal
+          // Chances especiais
+          const randomChance = Math.random();
+          const isCritical = randomChance < 0.05;
+          const isFail = randomChance >= 0.05 && randomChance < 0.15;
+          let resultType;
+          if (isCritical || isFail) {
+            const players = [
+              { id: duel.challengerId, name: duel.challengerName },
+              { id: duel.challengedId, name: duel.challengedName }
+            ];
+            const winnerIndex = Math.floor(Math.random() * 2);
+            winner = players[winnerIndex];
+            loser = players[1 - winnerIndex];
+            resultType = isCritical ? 'critical' : 'fail';
+          } else {
+            const result = determineWinner(duel.challengerAction, duel.challengedAction);
+            if (result === 'tie') {
+              duelResult = getRandomPhrase(duelResults.tie, {
+                player1Id: duel.challengerId,
+                player1Name: duel.challengerName,
+                player2Id: duel.challengedId,
+                player2Name: duel.challengedName
+              });
+              // Salvar estatística de duelo completado
+              saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
+              await ctx.telegram.sendMessage(
+                duel.chatId,
+                `🏁 <b>RESULTADO DO DUELO!</b> 🏁\n\n${duelResult}`,
+                { 
+                  parse_mode: 'HTML',
+                  reply_to_message_id: duel.originalMessageId
+                }
+              );
+              await ctx.telegram.editMessageReplyMarkup(
+                duel.chatId,
+                duel.messageId,
+                null,
+                { inline_keyboard: [] }
+              ).catch(() => {});
+              activeDuels.delete(duelKey);
+              return;
+            }
+            if (result === 'player1') {
+              winner = { id: duel.challengerId, name: duel.challengerName };
+              loser = { id: duel.challengedId, name: duel.challengedName };
+            } else {
+              winner = { id: duel.challengedId, name: duel.challengedName };
+              loser = { id: duel.challengerId, name: duel.challengerName };
+            }
+            if (duel.challengerAction === 'attack' && duel.challengedAction === 'flee') {
+              resultType = 'attack_vs_flee';
+            } else if (duel.challengerAction === 'flee' && duel.challengedAction === 'attack') {
+              resultType = 'attack_vs_flee';
+            } else if (duel.challengerAction === 'defend' && duel.challengedAction === 'attack') {
+              resultType = 'defend_vs_attack';
+            } else if (duel.challengerAction === 'attack' && duel.challengedAction === 'defend') {
+              resultType = 'defend_vs_attack';
+            } else if (duel.challengerAction === 'flee' && duel.challengedAction === 'defend') {
+              resultType = 'flee_vs_defend';
+            } else if (duel.challengerAction === 'defend' && duel.challengedAction === 'flee') {
+              resultType = 'flee_vs_defend';
+            }
+          }
+          duelResult = getRandomPhrase(duelResults[resultType], {
+            winnerId: winner.id,
+            winnerName: winner.name,
+            loserId: loser.id,
+            loserName: loser.name
+          });
+        }
+        // Salvar vitória e estatísticas no ranking por grupo
+        console.log('[DEBUG] Salvando vitória do duelo', { groupId: duel.groupId, winnerId: winner.id, winnerName: winner.name });
+        saveWin(duel.groupId, String(winner.id), winner.name);
+        saveStatistics(duel.groupId, 'win', String(winner.id), winner.name);
         // Salvar estatística de duelo completado
-        saveStatistics('completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
-        
+        saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
         // Enviar mensagem com o resultado
         await ctx.telegram.sendMessage(
           duel.chatId,
-          `🏁 <b>RESULTADO DO DUELO!</b> 🏁\n\n${result}`,
+          `🏁 <b>RESULTADO DO DUELO!</b> 🏁\n\n${duelResult}`,
           { 
             parse_mode: 'HTML',
             reply_to_message_id: duel.originalMessageId
           }
         );
-        
-        // Remover botões da mensagem original
-        await ctx.telegram.editMessageReplyMarkup(
-          duel.chatId,
-          duel.messageId,
-          null,
-          { inline_keyboard: [] }
-        ).catch(() => {});
-        
+        // Excluir a mensagem de "DUELO EM ANDAMENTO"
+        await ctx.telegram.deleteMessage(duel.chatId, duel.messageId).catch(() => {});
         // Remover duelo da memória
         activeDuels.delete(duelKey);
       } else {
@@ -577,6 +703,7 @@ module.exports = (bot) => {
       
     } catch (error) {
       console.error('[ERROR] Erro no callback do duelo:', error.message);
+      await sendErrorToLogGroup(error, 'callback x1');
       ctx.answerCbQuery('❌ Erro ao processar ação!', { show_alert: true });
     }
   });

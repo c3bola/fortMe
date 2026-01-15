@@ -63,20 +63,6 @@ module.exports = (bot) => {
       bot.command('x1', sendDisabledResponse);
     }
 
-    if (config.commands.ranking) {
-      console.log('[DEBUG] Registrando comando /ranking...');
-      require('./user/ranking')(bot);
-    } else {
-      bot.command('ranking', sendDisabledResponse);
-    }
-
-    if (config.commands.x1stats) {
-      console.log('[DEBUG] Registrando comando /x1stats...');
-      require('./user/x1stats')(bot);
-    } else {
-      bot.command('x1stats', sendDisabledResponse);
-    }
-
     console.log('[DEBUG] Comandos de usuário carregados com sucesso.');
   } catch (error) {
     console.error('[ERROR] Falha ao registrar comandos de usuário:', error.message);

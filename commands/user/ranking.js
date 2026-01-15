@@ -4,24 +4,25 @@ const path = require('path');
 // Caminho para o banco de dados de ranking diário
 const dailyRankingPath = path.join(__dirname, '../../database/dailyx1.json');
 
-// Função para carregar ranking diário
-function loadDailyRanking() {
+// Função para carregar ranking diário do grupo específico
+function loadDailyRanking(groupId) {
   try {
     if (fs.existsSync(dailyRankingPath)) {
       const data = JSON.parse(fs.readFileSync(dailyRankingPath, 'utf8'));
-      const today = new Date().toDateString();
+      const today = new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
       
-      // Se é um novo dia, retorna ranking vazio
-      if (data.date !== today) {
-        return { date: today, ranking: {} };
+      // Verifica se existe dados para hoje e para o grupo
+      if (data[today] && data[today][groupId]) {
+        return data[today][groupId].ranking || {};
       }
-      return data;
+      
+      return {};
     } else {
-      return { date: new Date().toDateString(), ranking: {} };
+      return {};
     }
   } catch (error) {
     console.error('[ERROR] Erro ao carregar ranking diário:', error.message);
-    return { date: new Date().toDateString(), ranking: {} };
+    return {};
   }
 }
 
@@ -43,8 +44,13 @@ function getPositionEmoji(position) {
 module.exports = (bot) => {
   bot.command('ranking', (ctx) => {
     try {
-      const data = loadDailyRanking();
-      const ranking = data.ranking;
+      // Verifica se o comando foi usado em um grupo
+      const groupId = ctx.chat.id;
+      if (groupId > 0) {
+        return ctx.reply('❌ Este comando só pode ser usado em grupos!');
+      }
+      
+      const ranking = loadDailyRanking(groupId);
       
       // Verificar se há dados no ranking
       if (Object.keys(ranking).length === 0) {

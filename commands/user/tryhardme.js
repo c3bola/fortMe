@@ -49,7 +49,8 @@ module.exports = (bot) => {
     const banana = 100 - tryhard;
 
     const sentMessage = await ctx.reply(`⛏️ Hoje o ${mention} está ${tryhard}% Try Hard 🌟 e ${banana}% Embananado 🍌`, {
-      parse_mode: 'Markdown'
+      parse_mode: 'Markdown',
+      reply_to_message_id: ctx.message.message_id
     });
 
     jsonData[groupInfo.id][brasiliaDate][userId] = {
