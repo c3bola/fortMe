@@ -11,7 +11,7 @@ module.exports = (bot) => {
       { text: command, callback_data: `cmd_info_${command}` },
       { text: config.commands[command] ? '✅' : '☑️', callback_data: `cmdt_${command}` }
     ]);
-
+    console.log(buttons)
     // Enviar mensagem com os botões
     await ctx.reply('Configurações do Bot:', {
       reply_markup: {
@@ -21,7 +21,9 @@ module.exports = (bot) => {
   });
 
   // Callback para alternar o status dos comandos
+  
   bot.action(/cmdt_(.+)/, async (ctx) => {
+    console.log(25)
     const command = ctx.match[1];
 
     // Ler o arquivo de configuração existente

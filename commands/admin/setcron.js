@@ -10,22 +10,23 @@ module.exports = (bot) => {
     if (message.length < 2) {
       // Exibir ajuda com todas as opções de parâmetros
       const helpMessage = `
-<b>📋 Como usar o comando /setcron:</b>
+    <b>📋 Como usar o comando /setcron:</b>
 
-Defina o horário de execução para uma das tarefas automáticas. Use o formato:
-<code>/setcron HH:MM:SS!!&lt;cron type&gt;</code>
+    Defina o horário de execução para uma das tarefas automáticas. Use o formato:
+    <code>/setcron HH:MM:SS!!&lt;cron type&gt;</code>
 
-<b>Tipos de cron disponíveis:</b>
-- <code>fortgirls</code> - Configura o horário para análise das skins.
-- <code>tryhard</code> - Configura o horário para o ranking de Try Hard.
-- <code>jonesy</code> - Configura o horário para análise do Jonesy.
-- <code>fortme</code> - Configura o horário para análise do FortMe.
+    <b>Tipos de cron disponíveis:</b>
+    - <code>fortgirls</code> - Configura o horário para análise das skins.
+    - <code>tryhard</code> - Configura o horário para o ranking de Try Hard.
+    - <code>jonesy</code> - Configura o horário para análise do Jonesy.
+    - <code>fortme</code> - Configura o horário para análise do FortMe.
+    - <code>x1</code> - Configura o horário para envio do ranking diário de X1.
 
-<b>Exemplo de uso:</b>
-<code>/setcron 10:30:00!!fortgirls</code>
+    <b>Exemplo de uso:</b>
+    <code>/setcron 10:30:00!!fortgirls</code>
 
-<b>Dica:</b> Toque e copie qualquer tipo de cron acima para usar no comando. 😉
-      `.trim();
+    <b>Dica:</b> Toque e copie qualquer tipo de cron acima para usar no comando. 😉
+        `.trim();
 
       return ctx.reply(helpMessage, { parse_mode: 'HTML' });
     }
@@ -62,26 +63,36 @@ Defina o horário de execução para uma das tarefas automáticas. Use o formato
       const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
       // Verificar se o tipo de cron é válido
-      if (!config.cronJobs[cronType]) {
-        return ctx.reply(`Erro: Tipo de cron "${cronType}" inválido. Tipos válidos: fortgirls, tryhard, jonesy, fortme.`);
+      // Suporte ao novo cron x1
+      if (cronType === 'x1') {
+        // Salvar no config se não existir
+        if (!config.cronJobs.x1) {
+          config.cronJobs.x1 = { status: true, schedule: cronSchedule };
+        } else {
+          config.cronJobs.x1.schedule = cronSchedule;
+          config.cronJobs.x1.status = true;
+        }
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
+        initializeCronJobs();
+        const adminName = ctx.from.first_name || ctx.from.username || 'Desconhecido';
+        const cronMessage = `⏰ O cron "<b>${cronType}</b>" foi configurado para <b>${String(originalHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}</b> (Horário de Brasília) por <b>${adminName}</b>.`;
+        ctx.reply(cronMessage, { parse_mode: 'HTML' });
+        await logAction(bot, cronMessage);
+        return;
       }
 
-      // Atualizar o cron apenas se o status estiver ativo
+      if (!config.cronJobs[cronType]) {
+        return ctx.reply(`Erro: Tipo de cron "${cronType}" inválido. Tipos válidos: fortgirls, tryhard, jonesy, fortme, x1.`);
+      }
       if (!config.cronJobs[cronType].status) {
         return ctx.reply(`O cron "${cronType}" está desativado. Ative-o antes de configurar o horário.`);
       }
-
       config.cronJobs[cronType].schedule = cronSchedule;
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
-
-      // Reiniciar o cron
       initializeCronJobs();
-
       const adminName = ctx.from.first_name || ctx.from.username || 'Desconhecido';
       const cronMessage = `⏰ O cron "<b>${cronType}</b>" foi configurado para <b>${String(originalHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}</b> (Horário de Brasília) por <b>${adminName}</b>.`;
       ctx.reply(cronMessage, { parse_mode: 'HTML' });
-
-      // Registrar no grupo de logs
       await logAction(bot, cronMessage);
     } catch (error) {
       console.error('[ERROR] Falha ao atualizar o cron:', error.message);

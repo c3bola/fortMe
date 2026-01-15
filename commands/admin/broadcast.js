@@ -28,80 +28,9 @@ module.exports = (bot) => {
   };
 
   // Registrar grupos a partir dos arquivos daly
-  bot.command('registerGroups', async (ctx) => {
-    let groupIds = new Set();
-    let groupNames = {};
 
-    // Ler todos os arquivos daly e coletar os IDs e nomes dos grupos
-    dalyFiles.forEach((filePath) => {
-      if (fs.existsSync(filePath)) {
-        try {
-          const dalyData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-          Object.keys(dalyData).forEach((groupId) => {
-            groupIds.add(groupId);
-            if (dalyData[groupId]?.name) {
-              groupNames[groupId] = dalyData[groupId].name;
-            }
-          });
-        } catch (error) {
-          console.error(`[ERROR] Falha ao carregar ${filePath}:`, error.message);
-        }
-      }
-    });
-
-    // Inicializar a estrutura de broadcastData
-    let broadcastData = { groups: {}, messages: [] };
-    if (fs.existsSync(broadcastFilePath)) {
-      try {
-        broadcastData = JSON.parse(fs.readFileSync(broadcastFilePath, 'utf8'));
-        if (!broadcastData.groups) {
-          broadcastData.groups = {};
-        }
-      } catch (error) {
-        console.error('[ERROR] Falha ao carregar broadcast.json:', error.message);
-        broadcastData = { groups: {}, messages: [] };
-      }
-    }
-
-    // Registrar os grupos no broadcast.json
-    groupIds.forEach((groupId) => {
-      if (!broadcastData.groups[groupId]) {
-        broadcastData.groups[groupId] = {
-          id: groupId,
-          name: groupNames[groupId] || `Grupo ${groupId}` // Usar o nome do grupo dos arquivos daly ou um nome padrão
-        };
-      }
-    });
-
-    fs.writeFileSync(broadcastFilePath, JSON.stringify(broadcastData, null, 2), 'utf8');
-    // const logMessage = `📋 *Comando Executado:* /registerGroups\n👤 *Usuário:* ${ctx.from.username || ctx.from.first_name}\n✅ *Grupos Registrados:* ${groupIds.size}`;
-    await logToGroup(logMessage);
-    ctx.reply(`Grupos registrados com sucesso! Total de grupos: ${groupIds.size}`);
-  });
-
-  // Exibir grupos registrados com botões
-  bot.command('listGroups', async (ctx) => {
-    if (!fs.existsSync(broadcastFilePath)) {
-      return ctx.reply('Nenhum grupo registrado.');
-    }
-
-    const broadcastData = JSON.parse(fs.readFileSync(broadcastFilePath, 'utf8'));
-    const groupButtons = Object.values(broadcastData.groups).map((group) => [
-      { text: group.name, callback_data: `group_${group.id}` }
-    ]);
-
-    if (groupButtons.length === 0) {
-      return ctx.reply('Nenhum grupo registrado.');
-    }
-
-    const logMessage = `📋 *Comando Executado:* /listGroups\n👤 *Usuário:* ${ctx.from.username || ctx.from.first_name}`;
-    await logToGroup(logMessage);
-    ctx.reply('Grupos registrados:', {
-      reply_markup: {
-        inline_keyboard: groupButtons
-      }
-    });
-  });
+  // Exibir grupos registrados em formato de lista com link
+// Comando removido, agora unificado em /list
 
   // Registrar mensagem para divulgação
   bot.command('registerMessage', async (ctx) => {
@@ -126,6 +55,7 @@ module.exports = (bot) => {
 
     const messageData = {
       text: message || null, // Unificar text e caption
+      entities: null, // Preservar entidades de formatação
       fileType: null, // Tipo do arquivo (image, video, gif, etc.)
       fileId: null    // ID do arquivo (se houver)
     };
@@ -156,15 +86,32 @@ module.exports = (bot) => {
       // Verificar se a mensagem respondida contém uma legenda
       if (reply.caption) {
         messageData.text = reply.caption; // Usar a legenda como texto
+        messageData.entities = reply.caption_entities || null; // Preservar entidades da legenda
+      } else if (reply.text) {
+        messageData.text = reply.text; // Usar o texto
+        messageData.entities = reply.entities || null; // Preservar entidades do texto
+      }
+    } else if (ctx.message.entities && ctx.message.entities.length > 1) {
+      // Se não é reply, pegar entidades da própria mensagem (exceto o comando)
+      // Ajustar offset das entidades para remover o comando
+      const commandLength = ctx.message.text.split(' ')[0].length + 1; // /registerMessage + espaço
+      messageData.entities = ctx.message.entities
+        .filter(entity => entity.offset >= commandLength)
+        .map(entity => ({
+          ...entity,
+          offset: entity.offset - commandLength
+        }));
+      if (messageData.entities.length === 0) {
+        messageData.entities = null;
       }
     }
 
     // Atualizar a mensagem no arquivo
     broadcastData.message = messageData;
     fs.writeFileSync(broadcastFilePath, JSON.stringify(broadcastData, null, 2), 'utf8');
-    const logMessage = `📋 *Comando Executado:* /registerMessage\n👤 *Usuário:* ${ctx.from.username || ctx.from.first_name}\n📝 *Mensagem Registrada:* ${messageData.text || 'Nenhuma'}`;
+    const logMessage = `📋 *Comando Executado:* /registerMessage\n👤 *Usuário:* ${ctx.from.username || ctx.from.first_name}\n📝 *Mensagem Registrada:* ${messageData.text ? messageData.text.substring(0, 100) : 'Nenhuma'}...`;
     await logToGroup(logMessage);
-    ctx.reply('Mensagem registrada com sucesso!');
+    ctx.reply('✅ Mensagem registrada com sucesso! A formatação original foi preservada.');
   });
 
   // Enviar mensagem para os grupos registrados
@@ -188,44 +135,72 @@ module.exports = (bot) => {
 
     let successCount = 0;
     let failureCount = 0;
+    const failedGroups = [];
+
+    // Preparar opções com entidades se existirem
+    const getMessageOptions = (isCaption = false) => {
+      const options = {};
+      
+      if (message.entities && message.entities.length > 0) {
+        // Usar entidades nativas do Telegram
+        if (isCaption) {
+          options.caption_entities = message.entities;
+        } else {
+          options.entities = message.entities;
+        }
+      }
+      
+      return options;
+    };
 
     for (const group of groups) {
       try {
         if (message.fileType === 'image') {
-          // Enviar uma imagem com legenda
+          // Enviar uma imagem com legenda e entidades
           await bot.telegram.sendPhoto(group.id, message.fileId, {
             caption: message.text || '',
-            parse_mode: 'Markdown'
+            ...getMessageOptions(true)
           });
         } else if (message.fileType === 'video') {
-          // Enviar um vídeo com legenda
+          // Enviar um vídeo com legenda e entidades
           await bot.telegram.sendVideo(group.id, message.fileId, {
             caption: message.text || '',
-            parse_mode: 'Markdown'
+            ...getMessageOptions(true)
           });
         } else if (message.fileType === 'gif') {
-          // Enviar um GIF animado
+          // Enviar um GIF animado com legenda e entidades
           await bot.telegram.sendAnimation(group.id, message.fileId, {
             caption: message.text || '',
-            parse_mode: 'Markdown'
+            ...getMessageOptions(true)
           });
         } else if (message.text) {
-          // Enviar uma mensagem de texto
-          await bot.telegram.sendMessage(group.id, message.text, { parse_mode: 'Markdown' });
+          // Enviar uma mensagem de texto com entidades
+          await bot.telegram.sendMessage(group.id, message.text, getMessageOptions(false));
         } else {
           console.error(`[ERROR] Mensagem inválida: Nenhum texto ou arquivo encontrado.`);
           failureCount++;
+          failedGroups.push(group.name || group.id);
           continue;
         }
         successCount++;
+        console.log(`[SUCCESS] Broadcast enviado para: ${group.name || group.id}`);
+        
+        // Delay entre mensagens para respeitar rate limit
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (error) {
-        console.error(`Erro ao enviar mensagem para o grupo ${group.id}:`, error.message);
+        console.error(`[ERROR] Erro ao enviar mensagem para o grupo ${group.id}:`, error.message);
         failureCount++;
+        failedGroups.push(group.name || group.id);
       }
     }
 
     const logMessage = `📋 *Comando Executado:* /sendBroadcast\n👤 *Usuário:* ${ctx.from.username || ctx.from.first_name}\n✅ *Sucesso:* ${successCount}\n❌ *Falhas:* ${failureCount}`;
     await logToGroup(logMessage);
-    ctx.reply(`Mensagem enviada com sucesso para ${successCount} grupos. Falha em ${failureCount} grupos.`);
+    
+    let responseMsg = `✅ Mensagem enviada com sucesso para ${successCount} grupo(s).`;
+    if (failureCount > 0) {
+      responseMsg += `\n❌ Falha em ${failureCount} grupo(s): ${failedGroups.join(', ')}`;
+    }
+    ctx.reply(responseMsg);
   });
 };

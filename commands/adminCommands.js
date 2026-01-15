@@ -38,19 +38,20 @@ module.exports = (bot) => {
   };
 
   // Carregar comandos administrativos
-  loadCommand('./admin/manageGroups');
-  loadCommand('./admin/botConfig'); // Atualizado para o novo nome
+  loadCommand('./admin/botConfig');
+   // Atualizado para o novo nome
   loadCommand('./admin/clearDatabase');
-  loadCommand('./admin/listAdmins');
+  // loadCommand('./admin/listAdmins');
   loadCommand('./admin/addAdmin');
-  loadCommand('./admin/listconfig');
+  // loadCommand('./admin/listconfig');
   loadCommand('./admin/registerFortGirl');
   loadCommand('./admin/registerFortJonesy');
   loadCommand('./admin/registerFortMe');
   loadCommand('./admin/registerTryhardImage');
-  loadCommand('./admin/addGroup');
-  loadCommand('./admin/broadcast'); // Garantir que o comando broadcast seja carregado corretamente
-  loadCommand('./admin/setcron');
-  loadCommand('./admin/manageCrons');
+  loadCommand('./admin/sendRank');
+  loadCommand('./admin/list');
+  loadCommand('./admin/rm');
   loadCommand('./admin/manageFortGirls');
+  loadCommand('./admin/manageJonesy');
+  loadCommand('./admin/broadcast');
 };

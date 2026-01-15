@@ -36,7 +36,20 @@ ${Object.entries(config.cronJobs).map(([cronName, cronConfig]) => `
 `).join('\n')}
 
 <b>🏠 Grupos Registrados:</b>
-${config.groups.map(group => `- <b>ID:</b> <code>${group.id}</code> (<b>Status:</b> ${group.status ? 'Ativo ✅' : 'Inativo ❌'})`).join('\n')}
+// Grupos do broadcast.json
+(() => {
+  const fs = require('fs');
+  const path = require('path');
+  const broadcastPath = path.join(__dirname, '../../database/broadcast.json');
+  let broadcastGroups = [];
+  if (fs.existsSync(broadcastPath)) {
+    const broadcastData = JSON.parse(fs.readFileSync(broadcastPath, 'utf8'));
+    if (broadcastData.groups) {
+      broadcastGroups = Object.values(broadcastData.groups);
+    }
+  }
+  return broadcastGroups.map(group => `- <b>ID:</b> <code>${group.id}</code> (<b>Nome:</b> ${group.name || 'Sem nome'})`).join('\n');
+})()
 
 <b>⚙️ Comandos Ativos:</b>
 ${Object.entries(config.commands).map(([command, status]) => `- <b>${command}:</b> ${status ? 'Ativo ✅' : 'Inativo ❌'}`).join('\n')}
