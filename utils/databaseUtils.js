@@ -1,3 +1,15 @@
+/**
+ * =====================================================
+ * DEPRECADO - USE databaseUtilsMySQL.js
+ * =====================================================
+ * Este arquivo contém funções antigas que usavam JSON
+ * Mantido apenas para compatibilidade com comandos não migrados
+ * 
+ * IMPORTANTE: Não adicione novas funções aqui!
+ * Use databaseUtilsMySQL.js para todas as novas implementações
+ * =====================================================
+ */
+
 const fs = require('fs');
 const path = require('path');
 
