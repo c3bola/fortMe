@@ -16,15 +16,19 @@ const soloLosePhrases = [
   '😹 {username} duelou sozinho e perdeu até pra sorte!',
   '🫠 {username} tentou X1 solo. O bot ficou sem reação!'
 ];
-
-// Frases para quando o bot é desafiado
-const botChallengedPhrases = [
-  '🤖 {username}, você realmente acha que tem chance contra mim? Eu dropei em Tilted Towers antes de você nascer! 😎',
-  '🎮 {username}, eu tenho 99999 de Victory Royale! Você ainda tá treinando no Playground! 🏆',
-  '⚡ {username}, meu ping é 0ms e meu aim é perfeito! Você não tem chance, noob! 🎯',
-  '🚀 {username}, eu construo mais rápido que a luz! Seus 90s são lentos demais pra mim! 🏗️',
-  '👑 {username}, eu sou o rei do Battle Royale! Você ainda tá aprendendo a abrir baú! 📦'
-];
+// Utilitário para buscar dados tryhard/banana do dia
+function getTryhardData(groupId, userId) {
+  try {
+    const filePath = path.join(__dirname, '../../database/dalytryhard.json');
+    if (!fs.existsSync(filePath)) return null;
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const today = new Date().toISOString().split('T')[0];
+    if (!data[groupId] || !data[groupId][today] || !data[groupId][today][userId]) return null;
+    return data[groupId][today][userId];
+  } catch (e) {
+    return null;
+  }
+}
 
 // Frases temáticas para lógica B (lobby especial)
 const duelBonusPhrases = [
@@ -44,7 +48,6 @@ const duelBonusPhrases = [
   '🏹 {loser} errou o tiro final, vitória embananada para {winner}!',
   '🏖️ {winner} só queria brincar, mas acabou ganhando do tryhard {loser} no evento especial!'
 ];
-
 // Frases para resultados de duelos
 const duelResults = {
   attack_vs_flee: [
@@ -78,6 +81,13 @@ const duelResults = {
     "🤡 QUE FAIL! <a href='tg://user?id={loserId}'>{loserName}</a> errou tão feio que virou meme! <a href='tg://user?id={winnerId}'>{winnerName}</a> ganhou de graça! 📱"
   ]
 };
+const fs = require('fs');
+const path = require('path');
+// Caminho para o banco de dados de ranking diário
+const dailyRankingPath = path.join(__dirname, '../../database/dailyx1.json');
+
+// Tempo limite para duelos (30 minutos)
+const DUEL_TIMEOUT = 30 * 60 * 1000;
 
 const abandonmentPhrases = {
   singleAbandon: [
@@ -96,43 +106,132 @@ const abandonmentPhrases = {
   ]
 };
 
-// Tempo limite para duelos (30 minutos)
-const DUEL_TIMEOUT = 30 * 60 * 1000;
-
 // Armazenar duelos ativos em memória
 const activeDuels = new Map();
 
-// Importar funções MySQL
-const { getDailyTryhardData, saveX1Win, saveX1Statistics, ensureBotGroup, ensureUser, saveDuelMove, createDuelRecord, updateDuelResult, updateDuelStats } = require('../../utils/databaseUtilsMySQL');
-
-// Utilitário para buscar dados tryhard/banana do dia (agora usa MySQL)
-async function getTryhardData(groupId, userId) {
+// Função para carregar ranking diário por grupo e data
+function loadDailyRanking(groupId) {
   try {
-    const data = await getDailyTryhardData(groupId, userId);
-    return data;
-  } catch (e) {
-    console.error('[ERROR] Erro ao buscar dados tryhard:', e.message);
-    return null;
+    let data = {};
+    if (fs.existsSync(dailyRankingPath)) {
+      data = JSON.parse(fs.readFileSync(dailyRankingPath, 'utf8'));
+    }
+    const today = new Date().toISOString().split('T')[0];
+    if (!data[today]) data[today] = {};
+    if (!data[today][groupId]) {
+      data[today][groupId] = {
+        ranking: {},
+        statistics: {
+          totalDuels: 0,
+          completedDuels: 0,
+          abandonedDuels: 0,
+          players: {}
+        }
+      };
+    }
+    return { data, today, group: data[today][groupId] };
+  } catch (error) {
+    console.error('[ERROR] Erro ao carregar ranking diário:', error.message);
+    const today = new Date().toISOString().split('T')[0];
+    return {
+      data: {
+        [today]: {
+          [groupId]: {
+            ranking: {},
+            statistics: {
+              totalDuels: 0,
+              completedDuels: 0,
+              abandonedDuels: 0,
+              players: {}
+            }
+          }
+        }
+      },
+      today,
+      group: {
+        ranking: {},
+        statistics: {
+          totalDuels: 0,
+          completedDuels: 0,
+          abandonedDuels: 0,
+          players: {}
+        }
+      }
+    };
   }
 }
 
-// Função para salvar vitória no ranking por grupo (agora usa MySQL)
-async function saveWin(groupId, userId, userName) {
+// Função para salvar vitória no ranking por grupo
+function saveWin(groupId, userId, userName) {
   try {
-    await saveX1Win(groupId, userId, userName);
+    const { data, today, group } = loadDailyRanking(groupId);
+    if (!group.ranking[userId]) {
+      group.ranking[userId] = { name: userName, wins: 0 };
+    }
+    group.ranking[userId].wins++;
+    group.ranking[userId].name = userName;
+    data[today][groupId] = group;
+    fs.writeFileSync(dailyRankingPath, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('[ERROR] Erro ao salvar vitória:', error.message);
   }
 }
 
-// Função para salvar estatísticas por grupo (agora usa MySQL)
-async function saveStatistics(groupId, type, player1Id = null, player1Name = null, player2Id = null, player2Name = null) {
+// Função para salvar estatísticas por grupo
+function saveStatistics(groupId, type, player1Id = null, player1Name = null, player2Id = null, player2Name = null) {
   try {
-    await saveX1Statistics(groupId, type, player1Id, player1Name, player2Id, player2Name);
+    const { data, today, group } = loadDailyRanking(groupId);
+    // Incrementar contadores globais
+    if (type === 'started') {
+      group.statistics.totalDuels++;
+    } else if (type === 'completed') {
+      group.statistics.completedDuels++;
+    } else if (type === 'abandoned') {
+      group.statistics.abandonedDuels++;
+    }
+    // Atualizar estatísticas dos jogadores
+    const updatePlayerStats = (playerId, playerName, statType) => {
+      if (!playerId) return;
+      if (!group.statistics.players[playerId]) {
+        group.statistics.players[playerId] = {
+          name: playerName,
+          duelsStarted: 0,
+          duelsCompleted: 0,
+          duelsAbandoned: 0,
+          wins: 0
+        };
+      }
+      group.statistics.players[playerId].name = playerName;
+      if (statType === 'started') {
+        group.statistics.players[playerId].duelsStarted++;
+      } else if (statType === 'completed') {
+        group.statistics.players[playerId].duelsCompleted++;
+      } else if (statType === 'abandoned') {
+        group.statistics.players[playerId].duelsAbandoned++;
+      } else if (statType === 'win') {
+        group.statistics.players[playerId].wins++;
+      }
+    };
+    // Aplicar estatísticas baseadas no tipo
+    if (type === 'started' && player1Id && player2Id) {
+      updatePlayerStats(player1Id, player1Name, 'started');
+      updatePlayerStats(player2Id, player2Name, 'started');
+    } else if (type === 'completed' && player1Id && player2Id) {
+      updatePlayerStats(player1Id, player1Name, 'completed');
+      updatePlayerStats(player2Id, player2Name, 'completed');
+    } else if (type === 'abandoned') {
+      if (player1Id) updatePlayerStats(player1Id, player1Name, 'abandoned');
+      if (player2Id) updatePlayerStats(player2Id, player2Name, 'abandoned');
+    } else if (type === 'win' && player1Id) {
+      updatePlayerStats(player1Id, player1Name, 'win');
+    }
+    data[today][groupId] = group;
+    fs.writeFileSync(dailyRankingPath, JSON.stringify(data, null, 2));
   } catch (error) {
     console.error('[ERROR] Erro ao salvar estatísticas:', error.message);
   }
 }
+
 
 // Função para formatar menção HTML
 function formatMention(userId, name) {
@@ -164,6 +263,71 @@ function determineWinner(action1, action2) {
   return rules[action1] === action2 ? 'player1' : 'player2';
 }
 
+// Função para processar resultado do duelo
+function processDuelResult(challengerId, challengerName, challengedId, challengedName, challengerAction, challengedAction) {
+  // Chances especiais
+  const randomChance = Math.random();
+  const isCritical = randomChance < 0.05; // 5% chance de crítico
+  const isFail = randomChance >= 0.05 && randomChance < 0.15; // 10% chance de fail
+  
+  let winner, loser, resultType;
+  
+  if (isCritical || isFail) {
+    // Em caso de crítico ou fail, o resultado é aleatório
+    const players = [
+      { id: challengerId, name: challengerName },
+      { id: challengedId, name: challengedName }
+    ];
+    const winnerIndex = Math.floor(Math.random() * 2);
+    winner = players[winnerIndex];
+    loser = players[1 - winnerIndex];
+    resultType = isCritical ? 'critical' : 'fail';
+  } else {
+    const result = determineWinner(challengerAction, challengedAction);
+    
+    if (result === 'tie') {
+      return getRandomPhrase(duelResults.tie, {
+        player1Id: challengerId,
+        player1Name: challengerName,
+        player2Id: challengedId,
+        player2Name: challengedName
+      });
+    }
+    
+    if (result === 'player1') {
+      winner = { id: challengerId, name: challengerName };
+      loser = { id: challengedId, name: challengedName };
+    } else {
+      winner = { id: challengedId, name: challengedName };
+      loser = { id: challengerId, name: challengerName };
+    }
+    
+    // Determinar tipo de resultado baseado nas ações
+    if (challengerAction === 'attack' && challengedAction === 'flee') {
+      resultType = 'attack_vs_flee';
+    } else if (challengerAction === 'flee' && challengedAction === 'attack') {
+      resultType = 'attack_vs_flee';
+    } else if (challengerAction === 'defend' && challengedAction === 'attack') {
+      resultType = 'defend_vs_attack';
+    } else if (challengerAction === 'attack' && challengedAction === 'defend') {
+      resultType = 'defend_vs_attack';
+    } else if (challengerAction === 'flee' && challengedAction === 'defend') {
+      resultType = 'flee_vs_defend';
+    } else if (challengerAction === 'defend' && challengedAction === 'flee') {
+      resultType = 'flee_vs_defend';
+    }
+  }
+  
+  // Esta função não é mais usada diretamente, vitórias são salvas no callback
+  
+  return getRandomPhrase(duelResults[resultType], {
+    winnerId: winner.id,
+    winnerName: winner.name,
+    loserId: loser.id,
+    loserName: loser.name
+  });
+}
+
 // Utilitário para enviar erro ao grupo de logs
 async function sendErrorToLogGroup(error, context) {
   try {
@@ -193,66 +357,16 @@ module.exports = (bot) => {
         from: ctx.from?.id,
         text: ctx.message?.text
       });
-      
-      // Garantir que o grupo existe no banco de dados
-      const groupId = String(ctx.chat.id);
-      const groupName = ctx.chat.title || 'Grupo sem nome';
-      await ensureBotGroup(groupId, groupName);
-      
       const message = ctx.message;
       const challenger = message.from;
-      
-      // Obter o ID do bot
-      const botInfo = await ctx.telegram.getMe();
-      const botId = botInfo.id;
-      
-      // Extrair menção se houver
-      let challenged = null;
-      let hasMentionByUsername = false;
-      
-      // Verificar se é reply
-      if (message.reply_to_message) {
-        challenged = message.reply_to_message.from;
-      } 
-      // Verificar se há menção no texto
-      else if (message.entities) {
-        const mention = message.entities.find(e => e.type === 'mention' || e.type === 'text_mention');
-        if (mention) {
-          if (mention.type === 'text_mention') {
-            // Menção inline (clicável) - temos acesso ao objeto do usuário
-            challenged = mention.user;
-          } else if (mention.type === 'mention') {
-            // Menção por @username - API do Telegram não fornece o ID automaticamente
-            hasMentionByUsername = true;
-          }
-        }
-      }
-      
       console.log('[DEBUG] /x1 contexto inicial', {
         isReply: !!message.reply_to_message,
-        hasMention: !!challenged,
-        hasMentionByUsername: hasMentionByUsername,
         challengerId: challenger?.id,
-        challengedId: challenged?.id,
         chatId: ctx.chat?.id
       });
       
-      // Verificar se há menção por @username (que não conseguimos processar)
-      if (hasMentionByUsername && !challenged) {
-        console.log('[DEBUG] /x1 menção por @username detectada');
-        return ctx.reply(
-          '⚠️ Para desafiar alguém, você precisa <b>responder à mensagem</b> da pessoa!\n\n' +
-          '💡 Menções com @usuario não funcionam porque não consigo identificar quem você quer desafiar.\n\n' +
-          '✅ <b>Como usar:</b> Responda uma mensagem da pessoa e digite /x1',
-          { 
-            parse_mode: 'HTML',
-            reply_to_message_id: message.message_id
-          }
-        );
-      }
-      
-      // Verificar se não há ninguém sendo desafiado
-      if (!challenged) {
+      // Verificar se é uma resposta a outra mensagem
+      if (!message.reply_to_message) {
         // Jogar sozinho - usar frase aleatória
         console.log('[DEBUG] /x1 não é reply, enviando frase solo');
         const phrase = getRandomPhrase(soloLosePhrases, {
@@ -265,17 +379,7 @@ module.exports = (bot) => {
         });
       }
       
-      // Verificar se está desafiando o bot
-      if (challenged.id === botId) {
-        console.log('[DEBUG] /x1 desafiando o bot');
-        const phrase = getRandomPhrase(botChallengedPhrases, {
-          username: challenger.first_name || challenger.username || 'Anônimo'
-        });
-        return ctx.reply(phrase, { 
-          parse_mode: 'HTML',
-          reply_to_message_id: message.message_id
-        });
-      }
+      const challenged = message.reply_to_message.from;
       
       // Verificar se não está tentando desafiar a si mesmo
       if (challenger.id === challenged.id) {
@@ -292,6 +396,7 @@ module.exports = (bot) => {
       
       // Verificar se já existe um duelo ativo entre estes usuários
       const duelKey = `${Math.min(challenger.id, challenged.id)}-${Math.max(challenger.id, challenged.id)}`;
+      const groupId = String(ctx.chat.id);
       if (activeDuels.has(duelKey)) {
         console.log('[DEBUG] /x1 duelo já ativo', { duelKey });
         return ctx.reply(
@@ -302,17 +407,8 @@ module.exports = (bot) => {
           }
         );
       }
-      
-      // Garantir que ambos os usuários existem no banco de dados ANTES de criar o duelo
-      await ensureUser(String(challenger.id), 1, { first_name: challenger.first_name, username: challenger.username });
-      await ensureUser(String(challenged.id), 1, { first_name: challenged.first_name, username: challenged.username });
-      
-      // Criar registro do duelo no banco de dados
-      const duelId = await createDuelRecord(groupId, challenger.id, challenged.id);
-      
-      // Criar novo duelo em memória
+      // Criar novo duelo
       const duel = {
-        duelId: duelId,
         challengerId: challenger.id,
         challengerName: challenger.first_name || challenger.username || 'Anônimo',
         challengedId: challenged.id,
@@ -327,9 +423,8 @@ module.exports = (bot) => {
       };
       activeDuels.set(duelKey, duel);
       console.log('[DEBUG] /x1 duelo criado', { duelKey, challenger: duel.challengerId, challenged: duel.challengedId, groupId });
-      
       // Salvar estatística de duelo iniciado
-      await saveStatistics(groupId, 'started', challenger.id, challenger.first_name, challenged.id, challenged.first_name);
+      saveStatistics(groupId, 'started', challenger.id, challenger.first_name, challenged.id, challenged.first_name);
       
       // Criar botões inline
       const keyboard = {
@@ -357,7 +452,7 @@ module.exports = (bot) => {
       console.log('[DEBUG] /x1 mensagem de duelo enviada', { messageId: duel.messageId });
       
       // Remover duelo após 30 minutos se não for concluído
-      setTimeout(async () => {
+      setTimeout(() => {
         if (activeDuels.has(duelKey)) {
           const expiredDuel = activeDuels.get(duelKey);
           activeDuels.delete(duelKey);
@@ -369,9 +464,8 @@ module.exports = (bot) => {
               abandonerId: expiredDuel.challengedId,
               abandonerName: expiredDuel.challengedName
             });
-            await saveWin(expiredDuel.groupId, expiredDuel.challengerId, expiredDuel.challengerName);
-            await saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengedId, expiredDuel.challengedName);
-            await updateDuelResult(expiredDuel.duelId, expiredDuel.challengerId, 'abandoned');
+            saveWin(expiredDuel.groupId, expiredDuel.challengerId, expiredDuel.challengerName);
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengedId, expiredDuel.challengedName);
           } else if (!expiredDuel.challengerAction && expiredDuel.challengedAction) {
             message = getRandomPhrase(abandonmentPhrases.singleAbandon, {
               waiterId: expiredDuel.challengedId,
@@ -379,13 +473,11 @@ module.exports = (bot) => {
               abandonerId: expiredDuel.challengerId,
               abandonerName: expiredDuel.challengerName
             });
-            await saveWin(expiredDuel.groupId, expiredDuel.challengedId, expiredDuel.challengedName);
-            await saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName);
-            await updateDuelResult(expiredDuel.duelId, expiredDuel.challengedId, 'abandoned');
+            saveWin(expiredDuel.groupId, expiredDuel.challengedId, expiredDuel.challengedName);
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName);
           } else {
             message = `⏰ <b>Duelo expirado!</b>\n\n${getRandomPhrase(abandonmentPhrases.doubleAbandon)}`;
-            await saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName, expiredDuel.challengedId, expiredDuel.challengedName);
-            await updateDuelResult(expiredDuel.duelId, null, 'abandoned');
+            saveStatistics(expiredDuel.groupId, 'abandoned', expiredDuel.challengerId, expiredDuel.challengerName, expiredDuel.challengedId, expiredDuel.challengedName);
           }
           ctx.telegram.sendMessage(
             ctx.chat.id,
@@ -450,12 +542,8 @@ module.exports = (bot) => {
       // Registrar a ação
       if (userId === duel.challengerId) {
         duel.challengerAction = action;
-        // Salvar movimento no banco de dados
-        await saveDuelMove(duel.duelId, userId, action, 1);
       } else {
         duel.challengedAction = action;
-        // Salvar movimento no banco de dados
-        await saveDuelMove(duel.duelId, userId, action, 2);
       }
       
       const actionEmojis = { attack: '⚔️', defend: '🛡️', flee: '💨' };
@@ -466,8 +554,9 @@ module.exports = (bot) => {
       if (duel.challengerAction && duel.challengedAction) {
         // Lógica especial: 50% de chance de ativar lobby temático se ambos tiverem dados tryhard/banana
         const groupId = duel.groupId;
-        const challengerTryhard = await getTryhardData(groupId, String(duel.challengerId));
-        const challengedTryhard = await getTryhardData(groupId, String(duel.challengedId));
+        const today = new Date().toISOString().split('T')[0];
+        const challengerTryhard = getTryhardData(groupId, String(duel.challengerId));
+        const challengedTryhard = getTryhardData(groupId, String(duel.challengedId));
         let useBonusLogic = false;
         if (challengerTryhard && challengedTryhard && Math.random() < 0.5) {
           useBonusLogic = true;
@@ -520,7 +609,7 @@ module.exports = (bot) => {
                 player2Name: duel.challengedName
               });
               // Salvar estatística de duelo completado
-              await saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
+              saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
               await ctx.telegram.sendMessage(
                 duel.chatId,
                 `🏁 <b>RESULTADO DO DUELO!</b> 🏁\n\n${duelResult}`,
@@ -568,23 +657,10 @@ module.exports = (bot) => {
         }
         // Salvar vitória e estatísticas no ranking por grupo
         console.log('[DEBUG] Salvando vitória do duelo', { groupId: duel.groupId, winnerId: winner.id, winnerName: winner.name });
-        await saveWin(duel.groupId, String(winner.id), winner.name);
-        
-        // Se foi LOBBY ESPECIAL, incrementar tryhard para o vencedor
-        if (useBonusLogic) {
-          console.log('[DEBUG] Lobby especial - Incrementando tryhard do vencedor', { winnerId: winner.id, winnerName: winner.name });
-          await updateDuelStats(duel.groupId, String(winner.id), winner.name, { tryhard: 1 });
-        }
-        
-        // Atualizar resultado do duelo no banco
-        await updateDuelResult(duel.duelId, winner.id, 'completed');
-        
+        saveWin(duel.groupId, String(winner.id), winner.name);
+        saveStatistics(duel.groupId, 'win', String(winner.id), winner.name);
         // Salvar estatística de duelo completado
-        await saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
-        
-        // Excluir a mensagem de "DUELO EM ANDAMENTO" ANTES de enviar o resultado
-        await ctx.telegram.deleteMessage(duel.chatId, duel.messageId).catch(() => {});
-        
+        saveStatistics(duel.groupId, 'completed', duel.challengerId, duel.challengerName, duel.challengedId, duel.challengedName);
         // Enviar mensagem com o resultado
         await ctx.telegram.sendMessage(
           duel.chatId,
@@ -594,7 +670,8 @@ module.exports = (bot) => {
             reply_to_message_id: duel.originalMessageId
           }
         );
-        
+        // Excluir a mensagem de "DUELO EM ANDAMENTO"
+        await ctx.telegram.deleteMessage(duel.chatId, duel.messageId).catch(() => {});
         // Remover duelo da memória
         activeDuels.delete(duelKey);
       } else {
