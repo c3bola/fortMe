@@ -15,28 +15,6 @@
     "id": -1002578635990,
     "topic": 716
   },
-  "cronJobs": {
-    "fortgirls": {
-      "status": true,
-      "schedule": "19 48 11 * * *"
-    },
-    "tryhard": {
-      "status": true,
-      "schedule": "49 35 11 * * *"
-    },
-    "jonesy": {
-      "status": false,
-      "schedule": "0 0 22 * * *"
-    },
-    "x1promotion": {
-      "status": true,
-      "schedule": "0 30 14 * * *"
-    },
-    "fortme": {
-      "status": false,
-      "schedule": "0 0 23 * * *"
-    }
-  },
   "tryhardme": {
     "tryhard": {
       "normaly": {

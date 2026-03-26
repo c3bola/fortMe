@@ -3,6 +3,7 @@ const config = require('./config/config');
 const userCommands = require('./commands/userCommands');
 const adminCommands = require('./commands/adminCommands');
 const { ensureGroupInBroadcast } = require('./utils/broadcastUtils');
+const { testConnection, closePool } = require('./database/dbConnection');
 
 const bot = new Telegraf(config.apiKey);
 
@@ -115,7 +116,16 @@ console.log('[INFO] ========================================');
 console.log('[INFO] Iniciando bot...');
 console.log('[INFO] ========================================');
 
-bot.launch()
+// Testar conexão com MySQL antes de iniciar o bot
+testConnection()
+  .then((connected) => {
+    if (!connected) {
+      console.error('[CRITICAL] Não foi possível conectar ao MySQL. Verifique o arquivo .env');
+      process.exit(1);
+    }
+    
+    return bot.launch();
+  })
   .then(() => {
     console.log('[SUCCESS] ========================================');
     console.log('[SUCCESS] ✓ Bot iniciado com sucesso!');
@@ -133,10 +143,10 @@ bot.launch()
 // Habilitar encerramento seguro
 process.once('SIGINT', () => {
   console.log('[INFO] Recebido sinal SIGINT. Encerrando bot...');
-  bot.stop('SIGINT');
+  closePool().then(() => bot.stop('SIGINT'));
 });
 
 process.once('SIGTERM', () => {
   console.log('[INFO] Recebido sinal SIGTERM. Encerrando bot...');
-  bot.stop('SIGTERM');
+  closePool().then(() => bot.stop('SIGTERM'));
 });
