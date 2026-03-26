@@ -1,37 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+const {
+  getDailyLoveHateRanking,
+  getTryhardRanking,
+  getX1TopRanking
+} = require('../../utils/databaseUtilsMySQL');
 
-// Caminho para o banco de dados de ranking diário
-const dailyRankingPath = path.join(__dirname, '../../database/dailyx1.json');
-
-// Função para carregar ranking diário do grupo específico
-function loadDailyRanking(groupId) {
-  try {
-    if (fs.existsSync(dailyRankingPath)) {
-      const data = JSON.parse(fs.readFileSync(dailyRankingPath, 'utf8'));
-      const today = new Date().toISOString().split('T')[0]; // Formato: YYYY-MM-DD
-      
-      // Verifica se existe dados para hoje e para o grupo
-      if (data[today] && data[today][groupId]) {
-        return data[today][groupId].ranking || {};
-      }
-      
-      return {};
-    } else {
-      return {};
-    }
-  } catch (error) {
-    console.error('[ERROR] Erro ao carregar ranking diário:', error.message);
-    return {};
-  }
-}
-
-// Função para formatar menção HTML
-function formatMention(userId, name) {
-  return `<a href="tg://user?id=${userId}">${name}</a>`;
-}
-
-// Função para obter emoji de posição
+// Emojis de posição
 function getPositionEmoji(position) {
   const emojis = {
     1: '🥇',
@@ -41,70 +14,202 @@ function getPositionEmoji(position) {
   return emojis[position] || '🏅';
 }
 
+// Formatar menção HTML
+function formatMention(userId, name) {
+  return `<a href="tg://user?id=${userId}">${name}</a>`;
+}
+
 module.exports = (bot) => {
-  bot.command('ranking', (ctx) => {
+  bot.command('ranking', async (ctx) => {
     try {
-      // Verifica se o comando foi usado em um grupo
+      // Apenas em grupos
+      if (ctx.chat.type === 'private') {
+        return ctx.reply('❌ Este comando só funciona em grupos!');
+      }
+      
       const groupId = ctx.chat.id;
-      if (groupId > 0) {
-        return ctx.reply('❌ Este comando só pode ser usado em grupos!');
-      }
+      const args = ctx.message.text.split(' ');
+      const feature = args[1] ? args[1].toLowerCase() : 'x1';
       
-      const ranking = loadDailyRanking(groupId);
+      let message = '';
       
-      // Verificar se há dados no ranking
-      if (Object.keys(ranking).length === 0) {
-        return ctx.reply(
-          '📊 <b>Ranking de X1s do dia:</b>\n\n' +
-          '🤷‍♂️ Ninguém duelou hoje ainda!\n' +
-          '💥 Use /x1 em resposta à mensagem de alguém para começar os duelos!',
-          { parse_mode: 'HTML' }
-        );
-      }
-      
-      // Ordenar usuários por número de vitórias
-      const sortedUsers = Object.entries(ranking)
-        .map(([userId, userData]) => ({
-          userId: parseInt(userId),
-          name: userData.name,
-          wins: userData.wins
-        }))
-        .sort((a, b) => b.wins - a.wins);
-      
-      // Construir mensagem do ranking
-      let message = '🏆 <b>Ranking de X1s do dia:</b>\n\n';
-      
-      sortedUsers.forEach((user, index) => {
-        const position = index + 1;
-        const emoji = getPositionEmoji(position);
-        const mention = formatMention(user.userId, user.name);
-        const wins = user.wins;
-        const winsText = wins === 1 ? 'vitória' : 'vitórias';
+      // Ranking de X1 (padrão)
+      if (feature === 'x1') {
+        const ranking = await getX1TopRanking(groupId, 10);
         
-        message += `${emoji} <b>${position}.</b> ${mention} – ${wins} ${winsText}\n`;
-      });
-      
-      // Adicionar informações extras
-      const totalDuels = sortedUsers.reduce((sum, user) => sum + user.wins, 0);
-      message += `\n📈 <b>Total de duelos hoje:</b> ${totalDuels}`;
-      
-      // Adicionar emoji de campeão para o primeiro lugar
-      if (sortedUsers.length > 0) {
-        const champion = sortedUsers[0];
-        if (champion.wins >= 5) {
-          message += `\n👑 ${formatMention(champion.userId, champion.name)} é o <b>CAMPEÃO DO DIA</b>! 👑`;
-        } else if (champion.wins >= 3) {
-          message += `\n🔥 ${formatMention(champion.userId, champion.name)} está dominando! 🔥`;
+        if (ranking.length === 0) {
+          return ctx.reply(
+            '🏆 <b>Ranking de X1s:</b>\n\n' +
+            '🤷‍♂️ Ninguém duelou ainda!\n' +
+            '💥 Use /x1 em resposta à mensagem de alguém para começar!',
+            { parse_mode: 'HTML' }
+          );
         }
+        
+        message = '🏆 <b>Top 10 X1 do Grupo:</b>\n\n';
+        
+        ranking.forEach((user, index) => {
+          const position = index + 1;
+          const emoji = getPositionEmoji(position);
+          const mention = formatMention(user.fk_id_user, user.username || `User${user.fk_id_user}`);
+          const wins = user.wins;
+          const winRate = parseFloat(user.win_rate).toFixed(1);
+          
+          message += `${emoji} <b>${position}.</b> ${mention} – ${wins} vitórias (${winRate}%)\n`;
+        });
+        
+        if (ranking.length > 0) {
+          const champion = ranking[0];
+          if (champion.wins >= 10) {
+            message += `\n👑 <b>LENDA DO X1!</b> 👑`;
+          } else if (champion.wins >= 5) {
+            message += `\n🔥 <b>DOMINANDO OS DUELOS!</b> 🔥`;
+          }
+        }
+        
+        message += '\n\n💡 <i>Use /ranking [tipo] para outros rankings:</i>';
+        message += '\n• /ranking x1 - Top X1';
+        message += '\n• /ranking fortme - Mais amado/odiado';
+        message += '\n• /ranking fortgirl - Mais amada/odiada';
+        message += '\n• /ranking jonesyme - Jonesy favorito/menos favorito';
+        message += '\n• /ranking tryhard - Mais tryhard/banana';
       }
       
-      message += '\n\n💡 <i>O ranking reseta todo dia à meia-noite!</i>';
+      // Ranking FortMe (mais amado/odiado)
+      else if (feature === 'fortme') {
+        const ranking = await getDailyLoveHateRanking(groupId, 1); // feature_id 1
+        
+        if (!ranking.most_loved && !ranking.most_hated) {
+          return ctx.reply(
+            '💖 <b>Ranking FortMe:</b>\n\n' +
+            '🤷‍♂️ Ninguém votou ainda hoje!\n' +
+            'Use /fortme para começar!',
+            { parse_mode: 'HTML' }
+          );
+        }
+        
+        message = '💖 <b>Ranking FortMe do Dia:</b>\n\n';
+        
+        if (ranking.most_loved) {
+          const mention = formatMention(ranking.most_loved.user_id, ranking.most_loved.username || `User${ranking.most_loved.user_id}`);
+          message += `💖 <b>MAIS AMADO:</b> ${mention}\n`;
+          message += `   ${ranking.most_loved.heart_count} corações recebidos\n\n`;
+        }
+        
+        if (ranking.most_hated) {
+          const mention = formatMention(ranking.most_hated.user_id, ranking.most_hated.username || `User${ranking.most_hated.user_id}`);
+          message += `🎩 <b>MAIS ODIADO:</b> ${mention}\n`;
+          message += `   ${ranking.most_hated.hat_count} chapéus recebidos\n`;
+        }
+        
+        message += '\n💡 <i>Ranking reseta todo dia!</i>';
+      }
+      
+      // Ranking FortGirl
+      else if (feature === 'fortgirl') {
+        const ranking = await getDailyLoveHateRanking(groupId, 2); // feature_id 2
+        
+        if (!ranking.most_loved && !ranking.most_hated) {
+          return ctx.reply(
+            '💖 <b>Ranking FortGirl:</b>\n\n' +
+            '🤷‍♂️ Ninguém votou ainda hoje!\n' +
+            'Use /fortgirl para começar!',
+            { parse_mode: 'HTML' }
+          );
+        }
+        
+        message = '💖 <b>Ranking FortGirl do Dia:</b>\n\n';
+        
+        if (ranking.most_loved) {
+          const mention = formatMention(ranking.most_loved.user_id, ranking.most_loved.username || `User${ranking.most_loved.user_id}`);
+          message += `💖 <b>MAIS AMADA:</b> ${mention}\n`;
+          message += `   ${ranking.most_loved.heart_count} corações recebidos\n\n`;
+        }
+        
+        if (ranking.most_hated) {
+          const mention = formatMention(ranking.most_hated.user_id, ranking.most_hated.username || `User${ranking.most_hated.user_id}`);
+          message += `🎩 <b>MAIS ODIADA:</b> ${mention}\n`;
+          message += `   ${ranking.most_hated.hat_count} chapéus recebidos\n`;
+        }
+        
+        message += '\n💡 <i>Ranking reseta todo dia!</i>';
+      }
+      
+      // Ranking JonesyMe
+      else if (feature === 'jonesyme') {
+        const ranking = await getDailyLoveHateRanking(groupId, 3); // feature_id 3
+        
+        if (!ranking.most_loved && !ranking.most_hated) {
+          return ctx.reply(
+            '💖 <b>Ranking JonesyMe:</b>\n\n' +
+            '🤷‍♂️ Ninguém votou ainda hoje!\n' +
+            'Use /jonesyme para começar!',
+            { parse_mode: 'HTML' }
+          );
+        }
+        
+        message = '💖 <b>Ranking JonesyMe do Dia:</b>\n\n';
+        
+        if (ranking.most_loved) {
+          const mention = formatMention(ranking.most_loved.user_id, ranking.most_loved.username || `User${ranking.most_loved.user_id}`);
+          message += `💖 <b>JONESY FAVORITO:</b> ${mention}\n`;
+          message += `   ${ranking.most_loved.heart_count} corações recebidos\n\n`;
+        }
+        
+        if (ranking.most_hated) {
+          const mention = formatMention(ranking.most_hated.user_id, ranking.most_hated.username || `User${ranking.most_hated.user_id}`);
+          message += `🎩 <b>JONESY MENOS FAVORITO:</b> ${mention}\n`;
+          message += `   ${ranking.most_hated.hat_count} chapéus recebidos\n`;
+        }
+        
+        message += '\n💡 <i>Ranking reseta todo dia!</i>';
+      }
+      
+      // Ranking Tryhard
+      else if (feature === 'tryhard' || feature === 'tryhardme') {
+        const ranking = await getTryhardRanking(groupId);
+        
+        if (!ranking.most_tryhard && !ranking.most_banana) {
+          return ctx.reply(
+            '⛏️ <b>Ranking Tryhard:</b>\n\n' +
+            '🤷‍♂️ Ninguém usou /tryhardme hoje!\n' +
+            'Use /tryhardme para começar!',
+            { parse_mode: 'HTML' }
+          );
+        }
+        
+        message = '⛏️ <b>Ranking Tryhard do Dia:</b>\n\n';
+        
+        if (ranking.most_tryhard) {
+          const mention = formatMention(ranking.most_tryhard.user_id, ranking.most_tryhard.username || `User${ranking.most_tryhard.user_id}`);
+          message += `🌟 <b>MAIS TRYHARD:</b> ${mention}\n`;
+          message += `   ${ranking.most_tryhard.percentage}% tryhard!\n\n`;
+        }
+        
+        if (ranking.most_banana) {
+          const mention = formatMention(ranking.most_banana.user_id, ranking.most_banana.username || `User${ranking.most_banana.user_id}`);
+          message += `🍌 <b>MAIS EMBANANADO:</b> ${mention}\n`;
+          message += `   ${100 - ranking.most_banana.percentage}% banana!\n`;
+        }
+        
+        message += '\n💡 <i>Ranking reseta todo dia!</i>';
+      }
+      
+      else {
+        message = '❌ <b>Tipo de ranking inválido!</b>\n\n';
+        message += '<i>Rankings disponíveis:</i>\n';
+        message += '• /ranking x1\n';
+        message += '• /ranking fortme\n';
+        message += '• /ranking fortgirl\n';
+        message += '• /ranking jonesyme\n';
+        message += '• /ranking tryhard';
+      }
       
       ctx.reply(message, { parse_mode: 'HTML' });
       
     } catch (error) {
-      console.error('[ERROR] Erro no comando /ranking:', error.message);
-      ctx.reply('❌ Ocorreu um erro ao exibir o ranking. Tente novamente!');
+      console.error('[RANKING ERROR]', error);
+      ctx.reply('❌ Erro ao exibir ranking!');
     }
   });
 };

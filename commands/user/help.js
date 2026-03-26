@@ -5,19 +5,23 @@ module.exports = (bot) => {
 
     <b>📌 Comandos para Usuários:</b>
     - <b>/help</b> - Exibe esta lista de comandos 📝
-    - <b>/tryhardme</b> - Descubra se você é Try Hard ou Embananado hoje 💪🍌
+    - <b>/fortme</b> - Descubra sua sorte do dia no Fortnite 🎲
     - <b>/fortgirl</b> - Veja as skins disponíveis e avalie 👩‍🎤
     - <b>/jonesyme</b> - Descubra mais sobre o Jonesy no Fortnite 🧔
-    - <b>/x1</b> - Desafie alguém para um duelo interativo com botões ⚔️
-    - <b>/ranking</b> - Veja o ranking diário de vitórias em duelos X1 🏆
-    - <b>/x1stats</b> - Estatísticas detalhadas dos duelos X1 do dia 📊
-    - <b>/fortme</b> - Descubra sua sorte do dia no Fortnite 🎲
+    - <b>/tryhardme</b> - Descubra se você é Try Hard ou Embananado hoje 💪🍌
+    - <b>/x1</b> - Desafie alguém para um duelo X1 (responda a msg do oponente) ⚔️
+    - <b>/ranking</b> - Veja rankings diários por categoria 🏆
+        • <b>/ranking x1</b> — ranking de vitórias X1
+        • <b>/ranking fortme</b> — ranking fortme
+        • <b>/ranking fortgirl</b> — ranking fortgirl
+        • <b>/ranking jonesyme</b> — ranking jonesyme
+        • <b>/ranking tryhard</b> — ranking tryhard
 
     <b>🔒 Comandos para Administradores:</b>
     - <b>/addAdmin</b> - Adiciona novos administradores 👤
+    - <b>/rmAdmin</b> - Remove administradores (apenas perfil 5) 🚫
     - <b>/botConfig</b> ou <b>/config</b> - Configura comandos do bot ⚙️
-    - <b>/broadcast</b> - Gerencia mensagens de broadcast 📢
-    - <b>/clearDatabase</b> - Apaga os dados do banco de dados (dia atual ou completo) 🗑️
+    - <b>/broadcast</b> - Envia mensagens para todos os grupos registrados 📢
     - <b>/list</b> - Lista informações:
         • <b>admin</b> — administradores
         • <b>group</b> — grupos registrados
@@ -25,7 +29,6 @@ module.exports = (bot) => {
         • <b>jonesy</b> — imagens Jonesy
         • <b>fortGirls</b> — imagens FortGirls
         • <b>fortMe</b> — imagens FortMe
-    - <b>/manageCrons</b> - Gerencia o estado dos crons configurados ⏳
     - <b>/manageFortGirls</b> - Gerencia as skins registradas 👩‍🎤
     - <b>/manageJonesy</b> - Gerencia as skins do Jonesy 🧔
     - <b>/registerFortGirl</b> - Registra skins para o comando FortGirl 👗
@@ -33,9 +36,6 @@ module.exports = (bot) => {
     - <b>/registerFortMe</b> - Registra imagens para o comando FortMe 🎮
     - <b>/registerTryhardImage</b> - Registra imagens para Try Hard e Embananado 🎞️
     - <b>/rm</b> - Remove um item de jonesy, fortGirls ou fortMe ❌
-    - <b>/setcron</b> - Configura o horário das tarefas automáticas ⏰
-    - <b>/registerMessage</b> - Registra uma mensagem para divulgação ✉️
-    - <b>/sendBroadcast</b> - Envia mensagens para os grupos registrados 📢
 
     <b>💡 Dica:</b> Use os comandos com sabedoria e divirta-se no Fortnite! 🚀
     `.trim(), { parse_mode: 'HTML' });
