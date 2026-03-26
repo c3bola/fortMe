@@ -28,13 +28,6 @@ ${config.admins.map(admin => `- <b>${admin.name}</b> (ID: <code>${admin.id}</cod
 - <b>ID:</b> <code>${config.logGroup.id}</code>
 - <b>Tópico:</b> <code>${config.logGroup.topic || 'Nenhum'}</code>
 
-<b>⏰ Crons Configurados:</b>
-${Object.entries(config.cronJobs).map(([cronName, cronConfig]) => `
-- <b>${cronName}:</b>
-  - <b>Status:</b> ${cronConfig.status ? 'Ativo ✅' : 'Inativo ❌'}
-  - <b>Agendamento:</b> <code>${cronConfig.schedule}</code>
-`).join('\n')}
-
 <b>🏠 Grupos Registrados:</b>
 // Grupos do broadcast.json
 (() => {

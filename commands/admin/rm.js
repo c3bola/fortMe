@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../../config/config');
+const { checkAdminPermission } = require('./addAdmin');
 
 const files = {
   jonesy: path.join(__dirname, '../../database/fortjonesy.json'),
@@ -10,8 +11,9 @@ const files = {
 
 module.exports = (bot) => {
   bot.command('rm', async (ctx) => {
-    // Apenas administradores
-    if (!config.admins.some(admin => admin.id === ctx.from.id)) {
+    // Apenas administradores (perfil 4 ou 5)
+    const permission = await checkAdminPermission(ctx.from.id);
+    if (!permission.isAdmin) {
       return ctx.reply('Apenas administradores podem usar este comando.');
     }
 

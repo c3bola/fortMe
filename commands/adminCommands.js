@@ -39,11 +39,7 @@ module.exports = (bot) => {
 
   // Carregar comandos administrativos
   loadCommand('./admin/botConfig');
-   // Atualizado para o novo nome
-  loadCommand('./admin/clearDatabase');
-  // loadCommand('./admin/listAdmins');
   loadCommand('./admin/addAdmin');
-  // loadCommand('./admin/listconfig');
   loadCommand('./admin/registerFortGirl');
   loadCommand('./admin/registerFortJonesy');
   loadCommand('./admin/registerFortMe');
