@@ -20,3 +20,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+# Fluxo de Trabalho
+
+Para cada tarefa, siga obrigatoriamente esta sequência:
+
+1. Ler `AI_RULES.md`.
+2. Ler `ARCHITECTURE.md`.
+3. Ler os relatórios (`resume/`) relacionados ao módulo.
+4. Analisar os arquivos que serão modificados.
+5. Explicar o plano de implementação.
+6. Implementar somente o escopo solicitado.
+7. Revisar criticamente o próprio código.
+8. Atualizar a documentação.
+9. Aguardar aprovação.
+
+Nunca pule etapas.
+
