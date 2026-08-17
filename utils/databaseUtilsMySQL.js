@@ -1334,6 +1334,736 @@ async function updateDuelResult(duelId, winnerId, status) {
   }
 }
 
+// =====================================================
+// ELEMENTAIS - Módulo de Coleção de Sprites
+// =====================================================
+
+/**
+ * Lista todas as raridades ordenadas por display_order
+ * @returns {Promise<Array>}
+ */
+async function getElementalRarities() {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_rarity ORDER BY display_order ASC'
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar raridades:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Lista categorias ativas ordenadas por display_order
+ * @returns {Promise<Array>}
+ */
+async function getElementalCategories() {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_category WHERE is_active = 1 ORDER BY display_order ASC'
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar categorias:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca uma categoria pelo código interno
+ * @param {string} code - Código interno (ex: 'basic', 'gold')
+ * @returns {Promise<object|null>}
+ */
+async function getCategoryByCode(code) {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_category WHERE code = ? AND is_active = 1',
+      [code]
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar categoria por código:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca sprites cujo nome contenha o termo informado (case-insensitive)
+ * Retorna até 10 resultados para evitar listas excessivas
+ * @param {string} name - Termo de busca parcial ou exato
+ * @returns {Promise<Array>}
+ */
+async function getSpritesByName(name) {
+  try {
+    const result = await query(
+      `SELECT * FROM tb_elemental_sprite
+       WHERE name LIKE ? AND is_active = 1
+       ORDER BY
+         CASE WHEN LOWER(name) = LOWER(?) THEN 0 ELSE 1 END,
+         display_order ASC, name ASC
+       LIMIT 10`,
+      [`%${name}%`, name]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar sprites por nome:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca um sprite pelo slug url-safe
+ * @param {string} slug - Ex: 'duck', 'zero-point'
+ * @returns {Promise<object|null>}
+ */
+async function getSpriteBySlug(slug) {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_sprite WHERE slug = ? AND is_active = 1',
+      [slug]
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar sprite por slug:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca um sprite pelo ID
+ * @param {number} spriteId
+ * @returns {Promise<object|null>}
+ */
+async function getSpriteById(spriteId) {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_sprite WHERE id_elemental_sprite = ?',
+      [spriteId]
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar sprite por ID:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Lista todos os sprites ativos ordenados por display_order e nome
+ * @returns {Promise<Array>}
+ */
+async function getAllSprites() {
+  try {
+    const result = await query(
+      'SELECT * FROM tb_elemental_sprite WHERE is_active = 1 ORDER BY display_order ASC, name ASC'
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar sprites:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Lista variantes de um sprite com join de categoria e raridade
+ * @param {number} spriteId
+ * @returns {Promise<Array>}
+ */
+async function getVariantsBySpriteId(spriteId) {
+  try {
+    const result = await query(
+      `SELECT v.*, c.code AS category_code, c.name AS category_name, c.display_order AS category_order,
+              r.name AS rarity_name, r.color AS rarity_color
+       FROM tb_elemental_variant v
+       JOIN tb_elemental_category c ON v.fk_id_category = c.id_elemental_category
+       LEFT JOIN tb_elemental_rarity r ON v.fk_id_rarity = r.id_elemental_rarity
+       WHERE v.fk_id_sprite = ? AND v.is_active = 1
+       ORDER BY c.display_order ASC`,
+      [spriteId]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar variantes do sprite:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca uma variante pelo ID com join completo
+ * @param {number} variantId
+ * @returns {Promise<object|null>}
+ */
+async function getVariantById(variantId) {
+  try {
+    const result = await query(
+      `SELECT v.*, s.slug, s.name AS sprite_name, s.description AS sprite_description,
+              c.code AS category_code, c.name AS category_name,
+              r.name AS rarity_name, r.color AS rarity_color
+       FROM tb_elemental_variant v
+       JOIN tb_elemental_sprite s ON v.fk_id_sprite = s.id_elemental_sprite
+       JOIN tb_elemental_category c ON v.fk_id_category = c.id_elemental_category
+       LEFT JOIN tb_elemental_rarity r ON v.fk_id_rarity = r.id_elemental_rarity
+       WHERE v.id_elemental_variant = ?`,
+      [variantId]
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar variante por ID:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Lista variantes de uma categoria com join de sprite e raridade
+ * @param {number} categoryId
+ * @returns {Promise<Array>}
+ */
+async function getVariantsByCategory(categoryId) {
+  try {
+    const result = await query(
+      `SELECT v.*, s.slug, s.name AS sprite_name, s.description AS sprite_description,
+              s.display_order AS sprite_order,
+              r.name AS rarity_name, r.color AS rarity_color
+       FROM tb_elemental_variant v
+       JOIN tb_elemental_sprite s ON v.fk_id_sprite = s.id_elemental_sprite
+       LEFT JOIN tb_elemental_rarity r ON v.fk_id_rarity = r.id_elemental_rarity
+       WHERE v.fk_id_category = ? AND v.is_active = 1 AND s.is_active = 1
+       ORDER BY s.display_order ASC, s.name ASC`,
+      [categoryId]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar variantes da categoria:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Conta quantos usuários possuem uma variante na coleção
+ * @param {number} variantId
+ * @returns {Promise<number>}
+ */
+async function getVariantMembersCount(variantId) {
+  try {
+    const result = await query(
+      'SELECT COUNT(*) AS total FROM tb_elemental_collection WHERE fk_id_variant = ?',
+      [variantId]
+    );
+    return parseInt(result[0].total) || 0;
+  } catch (error) {
+    console.error('[DB] Erro ao contar membros da variante:', error.message);
+    return 0;
+  }
+}
+
+/**
+ * Atualiza o telegram_file_id de uma variante para usar cache nativo
+ * @param {number} variantId 
+ * @param {string} fileId 
+ */
+async function updateVariantFileId(variantId, fileId) {
+  try {
+    await query(
+      'UPDATE tb_elemental_variant SET telegram_file_id = ? WHERE id_elemental_variant = ?',
+      [fileId, variantId]
+    );
+    console.log(`[DB] ✓ Cache de imagem salvo para a variante ${variantId}`);
+  } catch (error) {
+    console.error('[DB] Erro ao salvar telegram_file_id da variante:', error.message);
+  }
+}
+
+/**
+ * Lista todas as variantes ativas com join completo
+ * @returns {Promise<Array>}
+ */
+async function getAllVariants() {
+  try {
+    const result = await query(
+      `SELECT v.*, s.slug, s.name AS sprite_name,
+              c.code AS category_code, c.name AS category_name,
+              r.name AS rarity_name
+       FROM tb_elemental_variant v
+       JOIN tb_elemental_sprite s ON v.fk_id_sprite = s.id_elemental_sprite
+       JOIN tb_elemental_category c ON v.fk_id_category = c.id_elemental_category
+       LEFT JOIN tb_elemental_rarity r ON v.fk_id_rarity = r.id_elemental_rarity
+       WHERE v.is_active = 1 
+         AND s.is_active = 1 
+         AND c.is_active = 1
+       ORDER BY c.display_order ASC, s.display_order ASC`
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar todas as variantes:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca a coleção completa de um usuário com join completo
+ * @param {number|string} userId
+ * @returns {Promise<Array>}
+ */
+async function getUserCollection(userId) {
+  try {
+    userId = BigInt(userId).toString();
+    const result = await query(
+      `SELECT col.*, v.image, v.fk_id_category, v.fk_id_rarity,
+              s.slug, s.name AS sprite_name,
+              c.code AS category_code, c.name AS category_name,
+              r.name AS rarity_name, r.color AS rarity_color
+       FROM tb_elemental_collection col
+       JOIN tb_elemental_variant v ON col.fk_id_variant = v.id_elemental_variant
+       JOIN tb_elemental_sprite s ON v.fk_id_sprite = s.id_elemental_sprite
+       JOIN tb_elemental_category c ON v.fk_id_category = c.id_elemental_category
+       LEFT JOIN tb_elemental_rarity r ON v.fk_id_rarity = r.id_elemental_rarity
+       WHERE col.fk_id_user = ?
+       ORDER BY c.display_order ASC, s.display_order ASC`,
+      [userId]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar coleção do usuário:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Retorna Set com os IDs de variantes que o usuário possui (checagem rápida)
+ * @param {number|string} userId
+ * @returns {Promise<Set<number>>}
+ */
+async function getUserCollectionIds(userId) {
+  try {
+    userId = BigInt(userId).toString();
+    const result = await query(
+      'SELECT fk_id_variant FROM tb_elemental_collection WHERE fk_id_user = ?',
+      [userId]
+    );
+    return new Set(result.map(r => r.fk_id_variant));
+  } catch (error) {
+    console.error('[DB] Erro ao buscar IDs da coleção:', error.message);
+    return new Set();
+  }
+}
+
+/**
+ * Verifica se um usuário possui uma variante na coleção
+ * @param {number|string} userId
+ * @param {number} variantId
+ * @returns {Promise<boolean>}
+ */
+async function hasVariantInCollection(userId, variantId) {
+  try {
+    userId = BigInt(userId).toString();
+    const result = await query(
+      'SELECT id_elemental_collection FROM tb_elemental_collection WHERE fk_id_user = ? AND fk_id_variant = ?',
+      [userId, variantId]
+    );
+    return result.length > 0;
+  } catch (error) {
+    console.error('[DB] Erro ao verificar variante na coleção:', error.message);
+    return false;
+  }
+}
+
+/**
+ * Alterna a presença de uma variante na coleção (marcar/desmarcar)
+ * @param {number|string} userId
+ * @param {number} variantId
+ * @returns {Promise<boolean>} true se adicionou, false se removeu
+ */
+async function toggleVariantInCollection(userId, variantId) {
+  try {
+    userId = BigInt(userId).toString();
+    const has = await hasVariantInCollection(userId, variantId);
+
+    if (has) {
+      await query(
+        'DELETE FROM tb_elemental_collection WHERE fk_id_user = ? AND fk_id_variant = ?',
+        [userId, variantId]
+      );
+      return false;
+    }
+
+    await query(
+      'INSERT INTO tb_elemental_collection (fk_id_user, fk_id_variant) VALUES (?, ?)',
+      [userId, variantId]
+    );
+    return true;
+  } catch (error) {
+    console.error('[DB] Erro ao alternar variante na coleção:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca (ou cria) a configuração do módulo Elementais do usuário
+ * @param {number|string} userId
+ * @returns {Promise<object>}
+ */
+async function getUserElementalConfig(userId) {
+  try {
+    userId = BigInt(userId).toString();
+    const existing = await query(
+      'SELECT * FROM tb_elemental_user_config WHERE fk_id_user = ?',
+      [userId]
+    );
+
+    if (existing.length > 0) return existing[0];
+
+    await query(
+      `INSERT INTO tb_elemental_user_config (fk_id_user, accept_help_requests, allow_private_messages, allow_group_mention)
+       VALUES (?, 1, 1, 1)`,
+      [userId]
+    );
+
+    return { fk_id_user: userId, accept_help_requests: 1, allow_private_messages: 1, allow_group_mention: 1 };
+  } catch (error) {
+    console.error('[DB] Erro ao buscar/criar config Elementais do usuário:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Atualiza as configurações do módulo Elementais do usuário
+ * @param {number|string} userId
+ * @param {object} data - { accept_help_requests?, allow_private_messages?, allow_group_mention? }
+ * @returns {Promise<void>}
+ */
+async function updateUserElementalConfig(userId, data) {
+  try {
+    userId = BigInt(userId).toString();
+    const { accept_help_requests, allow_private_messages, allow_group_mention, collection_image_id } = data;
+
+    await getUserElementalConfig(userId); // garante que a row existe
+
+    const updates = [];
+    const params = [];
+
+    if (accept_help_requests !== undefined)   { updates.push('accept_help_requests = ?');   params.push(accept_help_requests); }
+    if (allow_private_messages !== undefined) { updates.push('allow_private_messages = ?'); params.push(allow_private_messages); }
+    if (allow_group_mention !== undefined)    { updates.push('allow_group_mention = ?');    params.push(allow_group_mention); }
+    if (collection_image_id !== undefined)    { updates.push('collection_image_id = ?');    params.push(collection_image_id); }
+
+    if (updates.length === 0) return;
+
+    params.push(userId);
+    await query(
+      `UPDATE tb_elemental_user_config SET ${updates.join(', ')}, updated_at = NOW() WHERE fk_id_user = ?`,
+      params
+    );
+  } catch (error) {
+    console.error('[DB] Erro ao atualizar config Elementais do usuário:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Registra uma ajuda entre dois usuários
+ * @param {number|string} helperId - Usuário que ajudou
+ * @param {number|string} helpedId - Usuário que foi ajudado
+ * @param {number|string} groupId  - Grupo onde ocorreu a ajuda
+ * @param {number|null} variantId  - Variante que motivou a ajuda (null para genérica)
+ * @param {string|null} note       - Observação opcional
+ * @returns {Promise<number>} ID do registro criado
+ */
+async function recordHelp(helperId, helpedId, groupId, variantId = null, note = null) {
+  try {
+    helperId = BigInt(helperId).toString();
+    helpedId = BigInt(helpedId).toString();
+    groupId  = BigInt(groupId).toString();
+
+    const result = await query(
+      `INSERT INTO tb_elemental_help_log (fk_helper_id, fk_helped_id, fk_group_id, fk_id_variant, note)
+       VALUES (?, ?, ?, ?, ?)`,
+      [helperId, helpedId, groupId, variantId, note]
+    );
+    return result.insertId;
+  } catch (error) {
+    console.error('[DB] Erro ao registrar ajuda:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca o ranking de guardiões (quem mais ajudou) em um grupo
+ * @param {number|string} groupId
+ * @param {number} limit
+ * @returns {Promise<Array>}
+ */
+async function getTopHelpers(groupId, limit = 10) {
+  try {
+    groupId = BigInt(groupId).toString();
+    const result = await query(
+      `SELECT fk_helper_id AS user_id, COUNT(*) AS total_helped
+       FROM tb_elemental_help_log
+       WHERE fk_group_id = ?
+       GROUP BY fk_helper_id
+       ORDER BY total_helped DESC
+       LIMIT ?`,
+      [groupId, limit]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar top helpers:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Calcula o progresso da coleção do usuário
+ * @param {number|string} userId
+ * @returns {Promise<{total_owned: number, total_available: number, percentage: number}>}
+ */
+async function getUserCollectionProgress(userId) {
+  try {
+    userId = BigInt(userId).toString();
+    const [ownedResult, totalResult] = await Promise.all([
+      query(
+        'SELECT COUNT(*) AS total FROM tb_elemental_collection WHERE fk_id_user = ?',
+        [userId]
+      ),
+      query('SELECT COUNT(*) AS total FROM tb_elemental_variant WHERE is_active = 1')
+    ]);
+
+    const total_owned     = parseInt(ownedResult[0].total) || 0;
+    const total_available = parseInt(totalResult[0].total) || 0;
+    const percentage = total_available > 0
+      ? parseFloat(((total_owned / total_available) * 100).toFixed(1))
+      : 0;
+
+    return { total_owned, total_available, percentage };
+  } catch (error) {
+    console.error('[DB] Erro ao calcular progresso da coleção:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Busca o ranking global de colecionadores por total de variantes
+ * @param {number} limit
+ * @returns {Promise<Array>}
+ */
+async function getCollectionRanking(limit = 10) {
+  try {
+    const result = await query(
+      `SELECT fk_id_user AS user_id, COUNT(*) AS total_variants
+       FROM tb_elemental_collection
+       GROUP BY fk_id_user
+       ORDER BY total_variants DESC
+       LIMIT ?`,
+      [limit]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar ranking de colecionadores:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Busca atividades recentes de marcação em um grupo
+ * Filtra por usuários que já interagiram no grupo via log de ajudas
+ * @param {number|string} groupId
+ * @param {number} limit
+ * @returns {Promise<Array>}
+ */
+async function getRecentActivity(groupId, limit = 10) {
+  try {
+    groupId = BigInt(groupId).toString();
+    const result = await query(
+      `SELECT col.fk_id_user AS user_id, col.marked_at,
+              v.id_elemental_variant, s.name AS sprite_name, c.name AS category_name
+       FROM tb_elemental_collection col
+       JOIN tb_elemental_variant v ON col.fk_id_variant = v.id_elemental_variant
+       JOIN tb_elemental_sprite s ON v.fk_id_sprite = s.id_elemental_sprite
+       JOIN tb_elemental_category c ON v.fk_id_category = c.id_elemental_category
+       WHERE col.fk_id_user IN (
+         SELECT DISTINCT fk_helper_id FROM tb_elemental_help_log WHERE fk_group_id = ?
+         UNION
+         SELECT DISTINCT fk_helped_id FROM tb_elemental_help_log WHERE fk_group_id = ?
+       )
+       ORDER BY col.marked_at DESC
+       LIMIT ?`,
+      [groupId, groupId, limit]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar atividades recentes:', error.message);
+    return [];
+  }
+}
+/**
+ * Busca o ranking de guardiões com os nomes resolvidos
+ * @param {number|string} groupId 
+ * @param {number} limit 
+ * @returns {Promise<Array>}
+ */
+async function getTopHelpersWithNames(groupId, limit = 10) {
+  try {
+    groupId = BigInt(groupId).toString();
+    
+    const result = await query(
+      `SELECT 
+        h.fk_helper_id AS user_id, 
+        COUNT(*) AS total_helped,
+        MAX(CASE WHEN du_fname.fk_id_metadata = 1 THEN du_fname.value END) AS first_name,
+        MAX(CASE WHEN du_uname.fk_id_metadata = 3 THEN du_uname.value END) AS username
+       FROM tb_elemental_help_log h
+       LEFT JOIN tb_data_user du_fname ON h.fk_helper_id = du_fname.fk_id_user AND du_fname.fk_id_metadata = 1
+       LEFT JOIN tb_data_user du_uname ON h.fk_helper_id = du_uname.fk_id_user AND du_uname.fk_id_metadata = 3
+       WHERE h.fk_group_id = ?
+       GROUP BY h.fk_helper_id
+       ORDER BY total_helped DESC
+       LIMIT 10`,
+      [groupId]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar top helpers com nomes:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Busca usuários que possuem a variante e aceitam pedidos de ajuda
+ * @param {number} variantId 
+ * @param {number} limit 
+ * @returns {Promise<Array>}
+ */
+async function getHelpersForVariant(variantId, limit = 10) {
+  try {
+    console.log('Variaveis: '+ variantId, limit);
+    const result = await query(
+      `SELECT 
+        c.fk_id_user AS user_id,
+        MAX(CASE WHEN du_fname.fk_id_metadata = 1 THEN du_fname.value END) AS first_name,
+        MAX(CASE WHEN du_uname.fk_id_metadata = 3 THEN du_uname.value END) AS username,
+        cfg.allow_group_mention
+       FROM tb_elemental_collection c
+       JOIN tb_elemental_user_config cfg ON c.fk_id_user = cfg.fk_id_user
+       LEFT JOIN tb_data_user du_fname ON c.fk_id_user = du_fname.fk_id_user AND du_fname.fk_id_metadata = 1
+       LEFT JOIN tb_data_user du_uname ON c.fk_id_user = du_uname.fk_id_user AND du_uname.fk_id_metadata = 3
+       WHERE c.fk_id_variant = ?
+         AND cfg.accept_help_requests = 1
+       GROUP BY c.fk_id_user, cfg.allow_group_mention
+       ORDER BY RAND()
+       LIMIT 15`,
+      [variantId]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar ajudantes para variante:', error.message);
+    return [];
+  }
+}
+
+/**
+ * Busca um usuário pelo @username para comandos como /comparar
+ * @param {string} username 
+ * @returns {Promise<object|null>}
+ */
+async function getUserByUsername(username) {
+  try {
+    const cleanUsername = username.replace(/^@/, '');
+    const result = await query(
+      `SELECT 
+        u.id_user,
+        MAX(CASE WHEN du_fname.fk_id_metadata = 1 THEN du_fname.value END) AS first_name,
+        MAX(CASE WHEN du_uname.fk_id_metadata = 3 THEN du_uname.value END) AS username
+       FROM tb_user u
+       JOIN tb_data_user du_uname ON u.id_user = du_uname.fk_id_user AND du_uname.fk_id_metadata = 3
+       LEFT JOIN tb_data_user du_fname ON u.id_user = du_fname.fk_id_user AND du_fname.fk_id_metadata = 1
+       WHERE LOWER(du_uname.value) = LOWER(?)
+       GROUP BY u.id_user`,
+      [cleanUsername]
+    );
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar usuário por username:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Busca o ranking de colecionadores global com nomes
+ * @param {number} limit 
+ * @returns {Promise<Array>}
+ */
+async function getCollectionRankingWithNames(limit = 10) {
+  try {
+    const result = await query(
+      `SELECT 
+        c.fk_id_user AS user_id, 
+        COUNT(*) AS total_variants,
+        MAX(CASE WHEN du_fname.fk_id_metadata = 1 THEN du_fname.value END) AS first_name,
+        MAX(CASE WHEN du_uname.fk_id_metadata = 3 THEN du_uname.value END) AS username
+       FROM tb_elemental_collection c
+       LEFT JOIN tb_data_user du_fname ON c.fk_id_user = du_fname.fk_id_user AND du_fname.fk_id_metadata = 1
+       LEFT JOIN tb_data_user du_uname ON c.fk_id_user = du_uname.fk_id_user AND du_uname.fk_id_metadata = 3
+       GROUP BY c.fk_id_user
+       ORDER BY total_variants DESC
+       LIMIT ?`,
+      [limit]
+    );
+    return result;
+  } catch (error) {
+    console.error('[DB] Erro ao buscar ranking de colecionadores com nomes:', error.message);
+    return [];
+  }
+}
+
+// Retorna um Set com os IDs das variantes que o usuário dominou
+async function getUserDominatedIds(userId) {
+  try {
+    userId = BigInt(userId).toString();
+    const result = await query(
+      'SELECT fk_id_variant FROM tb_elemental_collection WHERE fk_id_user = ? AND is_dominated = 1',
+      [userId]
+    );
+    return new Set(result.map(r => r.fk_id_variant));
+  } catch (error) {
+    console.error('[DB] Erro ao buscar IDs dominados:', error.message);
+    return new Set();
+  }
+}
+
+// Alterna o status de dominação no banco de dados
+async function toggleVariantDomination(userId, variantId) {
+  try {
+    userId = BigInt(userId).toString();
+    
+    // 1. Verifica se o usuário de fato possui o sprite na coleção
+    const result = await query(
+      'SELECT is_dominated FROM tb_elemental_collection WHERE fk_id_user = ? AND fk_id_variant = ?',
+      [userId, variantId]
+    );
+
+    // Se vier vazio, lança um erro customizado que o comando possa identificar
+    if (result.length === 0) {
+      const error = new Error('NOT_IN_COLLECTION');
+      throw error;
+    }
+
+    const currentStatus = result[0].is_dominated;
+    // Garante a inversão correta independente de vir 1/0 ou true/false do banco
+    const newStatus = (currentStatus === 1 || currentStatus === true) ? 0 : 1;
+
+    // 2. Executa a atualização
+    await query(
+      'UPDATE tb_elemental_collection SET is_dominated = ? WHERE fk_id_user = ? AND fk_id_variant = ?',
+      [newStatus, userId, variantId]
+    );
+
+    return newStatus === 1; // Retorna true se agora está dominado, false se foi removido
+  } catch (error) {
+    console.error('[DB] Erro ao alternar dominação:', error.message);
+    throw error; // Repassa o erro para o comando tratar
+  }
+}
+
+
 module.exports = {
   // Database
   query,
@@ -1397,6 +2127,44 @@ module.exports = {
   createDuelRecord,
   saveDuelMove,
   updateDuelResult,
-  updateDuelStats // Renomear updateDuelStats -> já estava exportado
+  updateDuelStats, // já estava exportado
+
+    // Elementais — Módulo de Coleção de Sprites
+  getElementalRarities,
+  getSpritesByName,
+  getElementalCategories,
+  getCategoryByCode,
+  getSpriteBySlug,
+  getSpriteById,
+  getAllSprites,
+  getVariantsBySpriteId,
+  getVariantById,
+  getVariantsByCategory,
+  getVariantMembersCount,
+  getAllVariants,
+  getUserCollection,
+  getUserCollectionIds,
+  hasVariantInCollection,
+  toggleVariantInCollection,
+  getUserElementalConfig,
+  updateUserElementalConfig,
+  recordHelp,
+  getTopHelpers,
+  getUserCollectionProgress,
+  getCollectionRanking,
+  getRecentActivity,
+//Elementais ajuda
+  getTopHelpers,
+  getTopHelpersWithNames,
+  getUserCollectionProgress,
+  getCollectionRanking,
+  getCollectionRankingWithNames,
+  getRecentActivity,
+  getHelpersForVariant,
+  getUserByUsername,
+  updateVariantFileId,
+
+  getUserDominatedIds,
+  toggleVariantDomination
 };
 

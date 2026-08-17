@@ -45,7 +45,7 @@
       }
     }
   },
-  "commands": {
+ "commands": {
     "tryhardme": true,
     "help": true,
     "fortme": true,
@@ -53,6 +53,18 @@
     "jonesyme": true,
     "x1": true,
     "ranking": true,
-    "x1stats": true
+    "x1stats": true,
+    "elementais": true,
+    "sprite": true,
+    "colecao": true,
+    "faltam": true,
+    "estatisticas": true,
+    "perfil": true,
+    "configsprites": true,
+    "guardioes": true,
+    "diario": true,
+    "agradecer": true,
+    "ajuda": true,
+    "comparar": true
   }
 }

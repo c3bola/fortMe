@@ -1,7 +1,8 @@
 const {
   getDailyLoveHateRanking,
   getTryhardRanking,
-  getX1TopRanking
+  getX1TopRanking,
+  getCollectionRankingWithNames
 } = require('../../utils/databaseUtilsMySQL');
 
 // Emojis de posição
@@ -73,6 +74,7 @@ module.exports = (bot) => {
         message += '\n• /ranking fortgirl - Mais amada/odiada';
         message += '\n• /ranking jonesyme - Jonesy favorito/menos favorito';
         message += '\n• /ranking tryhard - Mais tryhard/banana';
+        message += '\n• /ranking elementais - Top Colecionadores';
       }
       
       // Ranking FortMe (mais amado/odiado)
@@ -193,6 +195,32 @@ module.exports = (bot) => {
         }
         
         message += '\n💡 <i>Ranking reseta todo dia!</i>';
+      }// Ranking Elementais (Colecionadores)
+      else if (feature === 'elementais' || feature === 'sprites') {
+        const ranking = await getCollectionRankingWithNames(10);
+        
+        if (ranking.length === 0) {
+          return ctx.reply(
+            '📦 <b>Ranking de Colecionadores:</b>\n\n' +
+            '🤷‍♂️ Ninguém começou uma coleção ainda!\n' +
+            'Use /elementais para começar a coletar!',
+            { parse_mode: 'HTML' }
+          );
+        }
+        
+        message = '📦 <b>Top 10 Colecionadores (Global):</b>\n\n';
+        
+        ranking.forEach((user, index) => {
+          const position = index + 1;
+          const emoji = getPositionEmoji(position);
+          const name = user.first_name || user.username || `Colecionador`;
+          const mention = formatMention(user.user_id, name);
+          const total = user.total_variants;
+          
+          message += `${emoji} <b>${position}.</b> ${mention} – ${total} sprite(s)\n`;
+        });
+        
+        message += '\n💡 <i>Dica: O ranking de colecionadores é global e mostra os maiores do bot inteiro!</i>';
       }
       
       else {
@@ -202,7 +230,8 @@ module.exports = (bot) => {
         message += '• /ranking fortme\n';
         message += '• /ranking fortgirl\n';
         message += '• /ranking jonesyme\n';
-        message += '• /ranking tryhard';
+        message += '• /ranking tryhard\n';
+        message += '• /ranking elementais';
       }
       
       ctx.reply(message, { parse_mode: 'HTML' });
