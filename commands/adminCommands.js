@@ -41,6 +41,7 @@ module.exports = (bot) => {
   loadCommand('./admin/botConfig');
   loadCommand('./admin/addAdmin');
   loadCommand('./admin/registerFortGirl');
+  loadCommand('./admin/configElemental');
   loadCommand('./admin/registerFortJonesy');
   loadCommand('./admin/registerFortMe');
   loadCommand('./admin/registerTryhardImage');
@@ -50,4 +51,5 @@ module.exports = (bot) => {
   loadCommand('./admin/manageFortGirls');
   loadCommand('./admin/manageJonesy');
   loadCommand('./admin/broadcast');
+
 };
