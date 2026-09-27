@@ -1,9 +1,9 @@
 const { Telegraf } = require('telegraf');
-const config = require('./config/config');
-const userCommands = require('./commands/userCommands');
-const adminCommands = require('./commands/adminCommands');
-const { ensureGroupInBroadcast } = require('./utils/broadcastUtils');
-const { testConnection, closePool } = require('./database/dbConnection');
+const config = require('./src/config/config');
+const userCommands = require('./src/commands/userCommands');
+const adminCommands = require('./src/commands/adminCommands');
+const { ensureGroupInBroadcast } = require('./src/utils/broadcastUtils');
+const { testConnection, closePool } = require('./src/database/dbConnection');
 
 const bot = new Telegraf(config.apiKey);
 
@@ -25,7 +25,7 @@ bot.use((ctx, next) => {
   return next();
 });
 
-// Middleware para normalizar comandos (remover @<botname>)
+// Middleware para normalizar comandos (remover @<botname>) e registrar grupos
 bot.use((ctx, next) => {
   if (ctx.message?.text) {
     const command = ctx.message.text.split(' ')[0];
@@ -40,21 +40,6 @@ bot.use((ctx, next) => {
   }
   return next();
 });
-
-// Middleware para garantir que todas as callbackQuery sejam respondidas
-bot.use((ctx, next) => {
-  if (ctx.callbackQuery) {
-    try {
-      ctx.answerCbQuery().catch((error) => {
-        console.error('[ERROR] Falha ao responder callbackQuery:', error.message);
-      });
-    } catch (error) {
-      console.error('[ERROR] Erro ao processar callbackQuery:', error.message);
-    }
-  }
-  return next();
-});
-
 
 // Carregar comandos de usuários
 console.log('[INFO] ========================================');
@@ -89,7 +74,6 @@ bot.catch((err, ctx) => {
   console.error('[ERROR] Mensagem de erro:', err.message);
   console.error('[ERROR] Stack trace:', err.stack);
   
-  // Tentar enviar mensagem de erro ao usuário
   if (ctx.chat) {
     try {
       ctx.reply('❌ Ocorreu um erro inesperado. O problema foi registrado e será corrigido em breve.').catch((replyErr) => {
@@ -116,7 +100,7 @@ console.log('[INFO] ========================================');
 console.log('[INFO] Iniciando bot...');
 console.log('[INFO] ========================================');
 
-// Testar conexão com MySQL antes de iniciar o bot
+// Testar conexões com MySQL antes de iniciar o bot
 testConnection()
   .then((connected) => {
     if (!connected) {
@@ -140,13 +124,13 @@ testConnection()
     process.exit(1);
   });
 
-// Habilitar encerramento seguro
+// Habilitar encerramento seguro (Graceful Shutdown)
 process.once('SIGINT', () => {
-  console.log('[INFO] Recebido sinal SIGINT. Encerrando bot...');
+  console.log('[INFO] Recebido sinal SIGINT. Encerrando bot e conexões...');
   closePool().then(() => bot.stop('SIGINT'));
 });
 
 process.once('SIGTERM', () => {
-  console.log('[INFO] Recebido sinal SIGTERM. Encerrando bot...');
+  console.log('[INFO] Recebido sinal SIGTERM. Encerrando bot e conexões...');
   closePool().then(() => bot.stop('SIGTERM'));
 });
