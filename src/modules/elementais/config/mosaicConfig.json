@@ -1,0 +1,12 @@
+{
+  "escurecimentoFundoGeral": 5,
+  "escurecimentoBloqueados": 12,
+  "escalaFinal": 0.4,
+  "escalaSprite": 0.85,
+  "margemExterna": 50,
+  "espacoEntreItens": 12,
+  "espacoEntreLinhas": 35,
+  "espacoEntreLinhasGrid": 15,
+  "alturaNomes": 45,
+  "MAX_COLS": 11
+}
